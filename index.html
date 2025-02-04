@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Food Visual Feedback</title>
+    <title>Improved Control Responsiveness</title>
     <style>
         * {
             margin: 0;
@@ -108,6 +108,7 @@
         let foodEatenEffect = false;
         let foodEatenEffectTimer = 0;
         const foodEatenEffectDuration = 5;
+        let directionQueue = []; // Direction queue for improved responsiveness
 
         function initGame() {
             snake = [{ x: box * 5, y: box * 5 }];
@@ -115,6 +116,7 @@
             score = 0;
             speed = 150;
             direction = 'RIGHT';
+            directionQueue = []; // Clear direction queue on init
             updateScoreDisplay();
             hideGameOver();
             isPaused = false;
@@ -138,9 +140,22 @@
         function changeDirection(event) {
             let newDirection = getDirectionFromInput(event);
             if (newDirection) {
-                updateDirection(newDirection);
+                enqueueDirection(newDirection); // Enqueue direction instead of directly updating
             }
         }
+
+        function enqueueDirection(newDirection) {
+            const oppositeDirections = {
+                UP: 'DOWN',
+                DOWN: 'UP',
+                LEFT: 'RIGHT',
+                RIGHT: 'LEFT'
+            };
+            if (directionQueue.length === 0 || newDirection !== oppositeDirections[directionQueue[directionQueue.length - 1]]) {
+                directionQueue.push(newDirection);
+            }
+        }
+
 
         function getDirectionFromInput(event) {
             if (event.key) {
@@ -156,17 +171,6 @@
             return null;
         }
 
-        function updateDirection(newDirection) {
-            const oppositeDirections = {
-                UP: 'DOWN',
-                DOWN: 'UP',
-                LEFT: 'RIGHT',
-                RIGHT: 'LEFT'
-            };
-            if (newDirection !== oppositeDirections[direction]) {
-                direction = newDirection;
-            }
-        }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -229,6 +233,18 @@
         }
 
         function moveSnake() {
+            if (directionQueue.length > 0) {
+                const nextDirection = directionQueue.shift();
+                const oppositeDirections = {
+                    UP: 'DOWN',
+                    DOWN: 'UP',
+                    LEFT: 'RIGHT',
+                    RIGHT: 'LEFT'
+                };
+                if (nextDirection !== oppositeDirections[direction]) {
+                    direction = nextDirection;
+                }
+            }
             const head = getNextHeadPosition();
             snake.unshift(head);
 
