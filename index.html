@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Snake Game - Enhanced Touch Controls</title>
 </head>
 <style>
     * {
@@ -33,6 +33,7 @@
         background: linear-gradient(135deg, #0d1117, #161b22);
         overflow: hidden;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        touch-action: pan-y pan-x; /* Ensure touch events are not blocked */
     }
 
     canvas {
@@ -82,7 +83,7 @@
 <body>
     <div>
       <div id="score" class="score">Score: 0</div>
-      <div class="game-container">
+      <div class="game-container" id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOver">Game Over!<br><button onclick="restartGame()">Restart</button></div>
       </div>
@@ -90,6 +91,7 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('gameContainer');
         canvas.width = canvas.height = Math.min(window.innerWidth * 0.9, 600);
 
         const box = canvas.width / 30;
@@ -101,6 +103,8 @@
         let gameLoop;
         let lastFrameTime = 0;
         const cornerRadius = 5; // Added corner radius for rounded snake
+        let touchStartX = null;
+        let touchStartY = null;
 
         function generateFood() {
             let foodX, foodY;
@@ -114,21 +118,29 @@
         document.addEventListener('keydown', changeDirection);
 
         function changeDirection(event) {
-            const key = event.key;
-            const oppositeDirections = {
-                UP: 'DOWN',
-                DOWN: 'UP',
-                LEFT: 'RIGHT',
-                RIGHT: 'LEFT'
-            };
-            const newDirection = {
-                ArrowUp: 'UP',
-                ArrowDown: 'DOWN',
-                ArrowLeft: 'LEFT',
-                ArrowRight: 'RIGHT'
-            }[key];
-            if (newDirection && newDirection !== oppositeDirections[direction]) {
-                direction = newDirection;
+            let newDirection;
+            if (event.key) { // Handle keyboard events
+                const key = event.key;
+                newDirection = {
+                    ArrowUp: 'UP',
+                    ArrowDown: 'DOWN',
+                    ArrowLeft: 'LEFT',
+                    ArrowRight: 'RIGHT'
+                }[key];
+            } else if (event.direction) { // Handle touch events
+                newDirection = event.direction;
+            }
+
+            if (newDirection) {
+                const oppositeDirections = {
+                    UP: 'DOWN',
+                    DOWN: 'UP',
+                    LEFT: 'RIGHT',
+                    RIGHT: 'LEFT'
+                };
+                if (newDirection !== oppositeDirections[direction]) {
+                    direction = newDirection;
+                }
             }
         }
 
@@ -254,6 +266,38 @@
         window.addEventListener('resize', () => {
             canvas.width = canvas.height = Math.min(window.innerWidth * 0.9, 600);
         });
+
+        gameContainer.addEventListener('touchstart', function(event) {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }, false);
+
+        gameContainer.addEventListener('touchend', function(event) {
+            if (touchStartX === null || touchStartY === null) {
+                return;
+            }
+
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+
+            let touchDirection = '';
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                touchDirection = dx > 0 ? 'RIGHT' : 'LEFT';
+            } else {
+                touchDirection = dy > 0 ? 'DOWN' : 'UP';
+            }
+
+            if (touchDirection) {
+                changeDirection({ direction: touchDirection });
+            }
+
+            touchStartX = null;
+            touchStartY = null;
+        }, false);
     </script>
 </body>
 
