@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Control Responsiveness</title>
+    <title>Enhanced Visual Clarity</title>
     <style>
         * {
             margin: 0;
@@ -108,7 +108,7 @@
         let foodEatenEffect = false;
         let foodEatenEffectTimer = 0;
         const foodEatenEffectDuration = 5;
-        let directionQueue = []; // Direction queue for improved responsiveness
+        let directionQueue = [];
 
         function initGame() {
             snake = [{ x: box * 5, y: box * 5 }];
@@ -116,7 +116,7 @@
             score = 0;
             speed = 150;
             direction = 'RIGHT';
-            directionQueue = []; // Clear direction queue on init
+            directionQueue = [];
             updateScoreDisplay();
             hideGameOver();
             isPaused = false;
@@ -140,7 +140,7 @@
         function changeDirection(event) {
             let newDirection = getDirectionFromInput(event);
             if (newDirection) {
-                enqueueDirection(newDirection); // Enqueue direction instead of directly updating
+                enqueueDirection(newDirection);
             }
         }
 
@@ -193,7 +193,7 @@
 
         function drawSnake() {
             snake.forEach((segment, index) => {
-                ctx.fillStyle = index === 0 ? '#00ff88' : '#00cc66';
+                ctx.fillStyle = index === 0 ? '#00bbff' : '#0099cc'; // Enhanced snake colors
                 drawRoundedRect(ctx, segment.x, segment.y, box, box, cornerRadius);
                 ctx.fill();
                 ctx.strokeStyle = '#161b22';
@@ -217,10 +217,10 @@
         }
 
         function drawFood() {
-            ctx.fillStyle = '#ff0033';
+            ctx.fillStyle = '#ff4444'; // Enhanced food color
             let foodSize = box / 2.5;
             if (foodEatenEffect && foodEatenEffectTimer > 0) {
-                const scaleFactor = 1 + 0.2 * (foodEatenEffectTimer / foodEatenEffectDuration); // Scale up to 1.2x
+                const scaleFactor = 1 + 0.2 * (foodEatenEffectTimer / foodEatenEffectDuration);
                 foodSize *= scaleFactor;
                 foodEatenEffectTimer--;
                 if (foodEatenEffectTimer === 0) {
@@ -359,12 +359,12 @@
         function pauseGame() {
             isPaused = true;
             stopGameLoop();
-            draw(); // Redraw to show pause screen immediately
+            draw();
         }
 
         function resumeGame() {
             isPaused = false;
-            lastFrameTime = performance.now(); // Reset lastFrameTime to avoid frame jump
+            lastFrameTime = performance.now();
             startGameLoop();
         }
 
