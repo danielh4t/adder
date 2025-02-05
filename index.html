@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Code Maintainability</title>
+    <title>Improved Code Maintainability</title>
     <style>
         * {
             margin: 0;
@@ -85,7 +85,7 @@
         <div id="score" class="score">Score: 0</div>
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
-            <div class="game-over" id="gameOver">Game Over!<br><button onclick="game.restart()">Restart</button></div>
+            <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
         </div>
     </div>
     <script>
@@ -204,6 +204,7 @@
                 this.container = document.getElementById('gameContainer');
                 this.scoreElement = document.getElementById('score');
                 this.gameOverElement = document.getElementById('gameOver');
+                this.restartButton = document.getElementById('restartButton');
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.canvas.width = this.canvas.height = this.canvasSize;
@@ -222,6 +223,7 @@
                 this.isPaused = false;
                 this.lastFrameTime = 0;
                 this.hideGameOver();
+                this.updateScore();
             }
 
             static drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -240,7 +242,6 @@
             }
 
             updateScore() {
-                this.score++;
                 this.scoreElement.innerText = `Score: ${this.score}`;
             }
 
@@ -309,6 +310,8 @@
                     this.touchStartX = null;
                     this.touchStartY = null;
                 }, false);
+
+                this.restartButton.addEventListener('click', () => this.restart());
 
                 window.addEventListener('resize', () => {
                     this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
