@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Code Maintainability</title>
+    <title>Snake Game with High Scores</title>
     <style>
         * {
             margin: 0;
@@ -41,10 +41,14 @@
             display: block;
         }
 
-        .score {
+        .score-container {
             padding: 10px 15px;
             font-size: 18px;
             text-align: center;
+        }
+
+        .score {
+            margin-bottom: 5px;
         }
 
         .game-over {
@@ -82,7 +86,10 @@
 
 <body>
     <div>
-        <div id="score" class="score">Score: 0</div>
+        <div class="score-container">
+            <div id="score" class="score">Score: 0</div>
+            <div id="highScore" class="score">High Score: 0</div>
+        </div>
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
             <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
@@ -203,6 +210,7 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.container = document.getElementById('gameContainer');
                 this.scoreElement = document.getElementById('score');
+                this.highScoreElement = document.getElementById('highScore');
                 this.gameOverElement = document.getElementById('gameOver');
                 this.restartButton = document.getElementById('restartButton');
                 this.box = 20;
@@ -223,6 +231,7 @@
                 this.isPaused = false;
                 this.lastFrameTime = 0;
                 this.hideGameOver();
+                this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
             }
 
@@ -243,6 +252,11 @@
 
             updateScore() {
                 this.scoreElement.innerText = `Score: ${this.score}`;
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    localStorage.setItem('highScore', this.highScore);
+                }
+                this.highScoreElement.innerText = `High Score: ${this.highScore}`;
             }
 
             showGameOver() {
