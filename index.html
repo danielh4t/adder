@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with High Scores</title>
+    <title>Snake Game with Delta-Time Game Loop</title>
     <style>
         * {
             margin: 0;
@@ -230,6 +230,7 @@
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
                 this.lastFrameTime = 0;
+                this.accumulatedTime = 0;
                 this.hideGameOver();
                 this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
@@ -384,7 +385,6 @@
 
             increaseSpeed() {
                 if (this.speed > 50) this.speed -= 5;
-                this.resetLoop();
             }
 
             draw() {
@@ -403,27 +403,30 @@
             }
 
             gameCycle = (timestamp) => {
-                if (!this.lastFrameTime) this.lastFrameTime = timestamp;
-                const progress = timestamp - this.lastFrameTime;
-                if (progress > this.speed) {
-                    this.update();
+                if (!this.lastFrameTime) {
                     this.lastFrameTime = timestamp;
                 }
+                const deltaTime = timestamp - this.lastFrameTime;
+                this.lastFrameTime = timestamp;
+                this.accumulatedTime += deltaTime;
+
+                while (this.accumulatedTime > this.speed) {
+                    if (!this.isPaused) {
+                        this.update();
+                    }
+                    this.accumulatedTime -= this.speed;
+                }
+
                 this.gameLoop = requestAnimationFrame(this.gameCycle);
             }
 
             startLoop() {
+                this.lastFrameTime = performance.now();
                 this.gameLoop = requestAnimationFrame(this.gameCycle);
             }
 
             stopLoop() {
                 cancelAnimationFrame(this.gameLoop);
-            }
-
-            resetLoop() {
-                this.stopLoop();
-                this.lastFrameTime = 0;
-                this.startLoop();
             }
         }
 
