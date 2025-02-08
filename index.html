@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Swipe Controls</title>
+    <title>Snake Game with Sound Effects</title>
     <style>
         * {
             margin: 0;
@@ -95,6 +95,8 @@
             <canvas id="gameCanvas"></canvas>
             <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
         </div>
+        <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
+        <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
     </div>
     <script>
         class Snake {
@@ -214,6 +216,8 @@
                 this.highScoreElement = document.getElementById('highScore');
                 this.gameOverElement = document.getElementById('gameOver');
                 this.restartButton = document.getElementById('restartButton');
+                this.eatSound = document.getElementById('eatSound');
+                this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.canvas.width = this.canvas.height = this.canvasSize;
@@ -263,6 +267,7 @@
 
             showGameOver() {
                 this.gameOverElement.style.display = 'block';
+                this.gameOverSound.play();
             }
 
             hideGameOver() {
@@ -373,6 +378,7 @@
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = 5;
+                    this.eatSound.play();
                 } else {
                     this.snake.pop();
                 }
