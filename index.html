@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Sound Effects</title>
+    <title>Snake Game with Enhanced Code Structure</title>
     <style>
         * {
             margin: 0;
@@ -95,8 +95,8 @@
             <canvas id="gameCanvas"></canvas>
             <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
         </div>
-        <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
-        <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
+        <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
+        <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
     </div>
     <script>
         class Snake {
@@ -118,7 +118,8 @@
                     LEFT: 'RIGHT',
                     RIGHT: 'LEFT'
                 };
-                if (this.directionQueue.length === 0 || newDirection !== oppositeDirections[this.directionQueue[this.directionQueue.length - 1]]) {
+                const lastQueued = this.directionQueue[this.directionQueue.length - 1];
+                if (lastQueued !== oppositeDirections[newDirection] && this.direction !== oppositeDirections[newDirection]) {
                     this.directionQueue.push(newDirection);
                 }
             }
@@ -126,10 +127,18 @@
             getNextHeadPosition() {
                 const head = { ...this.segments[0] };
                 switch (this.direction) {
-                    case 'UP': head.y -= this.box; break;
-                    case 'DOWN': head.y += this.box; break;
-                    case 'LEFT': head.x -= this.box; break;
-                    case 'RIGHT': head.x += this.box; break;
+                    case 'UP':
+                        head.y -= this.box;
+                        break;
+                    case 'DOWN':
+                        head.y += this.box;
+                        break;
+                    case 'LEFT':
+                        head.x -= this.box;
+                        break;
+                    case 'RIGHT':
+                        head.x += this.box;
+                        break;
                 }
                 return head;
             }
@@ -137,15 +146,7 @@
             move() {
                 if (this.directionQueue.length > 0) {
                     const nextDirection = this.directionQueue.shift();
-                    const oppositeDirections = {
-                        UP: 'DOWN',
-                        DOWN: 'UP',
-                        LEFT: 'RIGHT',
-                        RIGHT: 'LEFT'
-                    };
-                    if (nextDirection !== oppositeDirections[this.direction]) {
-                        this.direction = nextDirection;
-                    }
+                    this.direction = nextDirection;
                 }
                 const head = this.getNextHeadPosition();
                 this.segments.unshift(head);
@@ -226,6 +227,20 @@
                 this.startLoop();
             }
 
+            static COLORS = {
+                GAME_BACKGROUND: '#161b22',
+                SNAKE_HEAD: '#00bbff',
+                SNAKE_BODY: '#0099cc',
+                FOOD: '#ff4444',
+                BORDER: '#161b22',
+                PAUSE_OVERLAY: 'rgba(0, 0, 0, 0.5)',
+                PAUSE_TEXT: 'white',
+                GAME_OVER_BG: 'rgba(0, 0, 0, 0.9)',
+                GAME_OVER_TEXT: '#fff',
+                BUTTON_BG: '#e63946',
+                BUTTON_HOVER_BG: '#d62839'
+            };
+
             reset() {
                 this.score = 0;
                 this.speed = 150;
@@ -285,61 +300,61 @@
             }
 
             addEventListeners() {
-                document.addEventListener('keydown', (event) => {
-                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-                        const direction = {
-                            ArrowUp: 'UP',
-                            ArrowDown: 'DOWN',
-                            ArrowLeft: 'LEFT',
-                            ArrowRight: 'RIGHT'
-                        }[event.key];
-                        this.snake.enqueueDirection(direction);
-                    }
-                    if (event.code === 'Space') {
-                        if (this.isPaused) {
-                            this.resume();
-                        } else {
-                            this.pause();
-                        }
-                    }
-                });
-
-                this.container.addEventListener('touchstart', (event) => {
-                    this.touchStartX = event.touches[0].clientX;
-                    this.touchStartY = event.touches[0].clientY;
-                }, false);
-
-                this.container.addEventListener('touchend', (event) => {
-                    if (this.touchStartX === null || this.touchStartY === null) return;
-
-                    const touchEndX = event.changedTouches[0].clientX;
-                    const touchEndY = event.changedTouches[0].clientY;
-
-                    const dx = touchEndX - this.touchStartX;
-                    const dy = touchEndY - this.touchStartY;
-
-                    let touchDirection = '';
-
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        touchDirection = dx > 0 ? 'RIGHT' : 'LEFT';
-                    } else {
-                        touchDirection = dy > 0 ? 'DOWN' : 'UP';
-                    }
-
-                    if (touchDirection) this.snake.enqueueDirection(touchDirection);
-
-                    this.touchStartX = null;
-                    this.touchStartY = null;
-                }, false);
-
+                document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                this.container.addEventListener('touchstart', this.handleTouchStart.bind(this), false);
+                this.container.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
                 this.restartButton.addEventListener('click', () => this.restart());
+                window.addEventListener('resize', this.handleResize.bind(this));
+            }
 
-                window.addEventListener('resize', () => {
-                    this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
-                    this.canvas.width = this.canvas.height = this.canvasSize;
-                    this.box = this.canvasSize / 30;
-                    this.reset();
-                });
+            handleKeyDown(event) {
+                const keyMap = {
+                    ArrowUp: 'UP',
+                    ArrowDown: 'DOWN',
+                    ArrowLeft: 'LEFT',
+                    ArrowRight: 'RIGHT'
+                };
+                if (keyMap[event.key]) {
+                    this.snake.enqueueDirection(keyMap[event.key]);
+                }
+                if (event.code === 'Space') {
+                    this.isPaused ? this.resume() : this.pause();
+                }
+            }
+
+            handleTouchStart(event) {
+                this.touchStartX = event.touches[0].clientX;
+                this.touchStartY = event.touches[0].clientY;
+            }
+
+            handleTouchEnd(event) {
+                if (this.touchStartX === null || this.touchStartY === null) return;
+
+                const touchEndX = event.changedTouches[0].clientX;
+                const touchEndY = event.changedTouches[0].clientY;
+
+                const dx = touchEndX - this.touchStartX;
+                const dy = touchEndY - this.touchStartY;
+
+                let touchDirection = '';
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    touchDirection = dx > 0 ? 'RIGHT' : 'LEFT';
+                } else {
+                    touchDirection = dy > 0 ? 'DOWN' : 'UP';
+                }
+
+                if (touchDirection) this.snake.enqueueDirection(touchDirection);
+
+                this.touchStartX = null;
+                this.touchStartY = null;
+            }
+
+            handleResize() {
+                this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
+                this.canvas.width = this.canvas.height = this.canvasSize;
+                this.box = this.canvasSize / 30;
+                this.reset();
             }
 
             pause() {
@@ -355,9 +370,9 @@
             }
 
             drawPauseScreen() {
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                this.ctx.fillStyle = Game.COLORS.PAUSE_OVERLAY;
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.fillStyle = 'white';
+                this.ctx.fillStyle = Game.COLORS.PAUSE_TEXT;
                 this.ctx.font = '48px Arial';
                 this.ctx.textAlign = 'center';
                 this.ctx.fillText('Paused', this.canvas.width / 2, this.canvas.height / 2);
