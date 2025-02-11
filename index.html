@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Code Structure</title>
+    <title>Snake Game with Start Screen</title>
     <style>
         * {
             margin: 0;
@@ -51,7 +51,7 @@
             margin-bottom: 5px;
         }
 
-        .game-over {
+        .game-over, .start-screen {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -67,7 +67,7 @@
             z-index: 2;
         }
 
-        .game-over button {
+        .game-over button, .start-screen button {
             margin-top: 15px;
             padding: 10px 20px;
             background: #e63946;
@@ -79,7 +79,7 @@
             transition: background 0.3s ease;
         }
 
-        .game-over button:hover {
+        .game-over button:hover, .start-screen button:hover {
             background: #d62839;
         }
     </style>
@@ -94,9 +94,14 @@
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
             <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
+            <div class="start-screen" id="startScreen">
+                <h2>Welcome to Snake Game</h2>
+                <p>Use Arrow Keys or Swipe to Control the Snake</p>
+                <button id="startButton">Start Game</button>
+            </div>
+            <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
+            <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
         </div>
-        <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
-        <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
     </div>
     <script>
         class Snake {
@@ -216,7 +221,9 @@
                 this.scoreElement = document.getElementById('score');
                 this.highScoreElement = document.getElementById('highScore');
                 this.gameOverElement = document.getElementById('gameOver');
+                this.startScreen = document.getElementById('startScreen');
                 this.restartButton = document.getElementById('restartButton');
+                this.startButton = document.getElementById('startButton');
                 this.eatSound = document.getElementById('eatSound');
                 this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
@@ -224,7 +231,6 @@
                 this.canvas.width = this.canvas.height = this.canvasSize;
                 this.reset();
                 this.addEventListeners();
-                this.startLoop();
             }
 
             static COLORS = {
@@ -252,6 +258,7 @@
                 this.lastFrameTime = 0;
                 this.accumulatedTime = 0;
                 this.hideGameOver();
+                this.hideStartScreen();
                 this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
             }
@@ -289,9 +296,23 @@
                 this.gameOverElement.style.display = 'none';
             }
 
+            showStartScreen() {
+                this.startScreen.style.display = 'block';
+                this.stopLoop();
+            }
+
+            hideStartScreen() {
+                this.startScreen.style.display = 'none';
+            }
+
             gameOver() {
                 this.showGameOver();
                 this.stopLoop();
+            }
+
+            startGame() {
+                this.reset();
+                this.startLoop();
             }
 
             restart() {
@@ -304,6 +325,7 @@
                 this.container.addEventListener('touchstart', this.handleTouchStart.bind(this), false);
                 this.container.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
                 this.restartButton.addEventListener('click', () => this.restart());
+                this.startButton.addEventListener('click', () => this.startGame());
                 window.addEventListener('resize', this.handleResize.bind(this));
             }
 
@@ -453,6 +475,7 @@
         }
 
         const game = new Game();
+        game.showStartScreen();
     </script>
 </body>
 
