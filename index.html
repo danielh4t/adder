@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Start Screen</title>
+    <title>Snake Game with On-screen Controls</title>
     <style>
         * {
             margin: 0;
@@ -51,7 +51,8 @@
             margin-bottom: 5px;
         }
 
-        .game-over, .start-screen {
+        .game-over,
+        .start-screen {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -67,7 +68,8 @@
             z-index: 2;
         }
 
-        .game-over button, .start-screen button {
+        .game-over button,
+        .start-screen button {
             margin-top: 15px;
             padding: 10px 20px;
             background: #e63946;
@@ -79,8 +81,51 @@
             transition: background 0.3s ease;
         }
 
-        .game-over button:hover, .start-screen button:hover {
+        .game-over button:hover,
+        .start-screen button:hover {
             background: #d62839;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+        }
+
+        .control-button {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .control-button:active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        @media (min-width: 600px) {
+            .control-button {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -96,11 +141,23 @@
             <div class="game-over" id="gameOver">Game Over!<br><button id="restartButton">Restart</button></div>
             <div class="start-screen" id="startScreen">
                 <h2>Welcome to Snake Game</h2>
-                <p>Use Arrow Keys or Swipe to Control the Snake</p>
+                <p>Use Arrow Keys, Swipe or On-screen Buttons to Control the Snake</p>
                 <button id="startButton">Start Game</button>
             </div>
-            <audio id="eatSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
-            <audio id="gameOverSound" src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==" preload="auto"></audio>
+            <div class="controls" id="controls">
+                <button class="control-button" data-direction="UP">↑</button>
+                <div class="controls-row">
+                    <button class="control-button" data-direction="LEFT">←</button>
+                    <button class="control-button" data-direction="DOWN">↓</button>
+                    <button class="control-button" data-direction="RIGHT">→</button>
+                </div>
+            </div>
+            <audio id="eatSound"
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="
+                preload="auto"></audio>
+            <audio id="gameOverSound"
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="
+                preload="auto"></audio>
         </div>
     </div>
     <script>
@@ -224,6 +281,8 @@
                 this.startScreen = document.getElementById('startScreen');
                 this.restartButton = document.getElementById('restartButton');
                 this.startButton = document.getElementById('startButton');
+                this.controls = document.getElementById('controls');
+                this.controlButtons = document.querySelectorAll('.control-button');
                 this.eatSound = document.getElementById('eatSound');
                 this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
@@ -326,6 +385,12 @@
                 this.container.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
                 this.restartButton.addEventListener('click', () => this.restart());
                 this.startButton.addEventListener('click', () => this.startGame());
+                this.controlButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const direction = button.getAttribute('data-direction');
+                        this.snake.enqueueDirection(direction);
+                    });
+                });
                 window.addEventListener('resize', this.handleResize.bind(this));
             }
 
