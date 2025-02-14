@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Maintainability</title>
+    <title>Snake Game with Active Sound Effects</title>
     <style>
         * {
             margin: 0;
@@ -482,6 +482,7 @@
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = 5;
+                    this.eatSound.currentTime = 0;
                     this.eatSound.play();
                 } else {
                     this.snake.pop();
