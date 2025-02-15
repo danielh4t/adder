@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced User Interface</title>
+    <title>Snake Game with High-DPI Support</title>
     <style>
         * {
             margin: 0;
@@ -325,7 +325,12 @@
                 this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
-                this.canvas.width = this.canvas.height = this.canvasSize;
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.canvasSize * dpr;
+                this.canvas.height = this.canvasSize * dpr;
+                this.canvas.style.width = `${this.canvasSize}px`;
+                this.canvas.style.height = `${this.canvasSize}px`;
+                this.ctx.scale(dpr, dpr);
                 this.reset();
                 this.addEventListeners();
             }
@@ -348,7 +353,7 @@
                 this.score = 0;
                 this.speed = 150;
                 this.snake = new Snake(this.box);
-                this.food = new Food(this.box, this.canvas.width, this.canvas.height, this.snake.segments);
+                this.food = new Food(this.box, this.canvas.width / (window.devicePixelRatio || 1), this.canvas.height / (window.devicePixelRatio || 1), this.snake.segments);
                 this.foodEffect = false;
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
@@ -477,7 +482,12 @@
 
             handleResize() {
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
-                this.canvas.width = this.canvas.height = this.canvasSize;
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.canvasSize * dpr;
+                this.canvas.height = this.canvasSize * dpr;
+                this.canvas.style.width = `${this.canvasSize}px`;
+                this.canvas.style.height = `${this.canvasSize}px`;
+                this.ctx.scale(dpr, dpr);
                 this.box = this.canvasSize / 30;
                 this.reset();
             }
@@ -500,7 +510,7 @@
                 this.ctx.fillStyle = Game.COLORS.PAUSE_TEXT;
                 this.ctx.font = '48px Arial';
                 this.ctx.textAlign = 'center';
-                this.ctx.fillText('Paused', this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.fillText('Paused', this.canvas.width / (2 * (window.devicePixelRatio || 1)), this.canvas.height / (2 * (window.devicePixelRatio || 1)));
             }
 
             update() {
@@ -514,7 +524,7 @@
                 if (head.x === this.food.position.x && head.y === this.food.position.y) {
                     this.score += 10;
                     this.updateScore();
-                    this.food = new Food(this.box, this.canvas.width, this.canvas.height, this.snake.segments);
+                    this.food = new Food(this.box, this.canvas.width / (window.devicePixelRatio || 1), this.canvas.height / (window.devicePixelRatio || 1), this.snake.segments);
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = 5;
@@ -528,7 +538,7 @@
             }
 
             checkCollision(head) {
-                return head.x < 0 || head.x >= this.canvas.width || head.y < 0 || head.y >= this.canvas.height || this.snake.isCollision();
+                return head.x < 0 || head.x >= this.canvas.width / (window.devicePixelRatio || 1) || head.y < 0 || head.y >= this.canvas.height / (window.devicePixelRatio || 1) || this.snake.isCollision();
             }
 
             increaseSpeed() {
