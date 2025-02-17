@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with High-DPI Support</title>
+    <title>Snake Game with Improved Canvas Scaling</title>
     <style>
         * {
             margin: 0;
@@ -195,7 +195,7 @@
                 src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAA=="
                 preload="auto"></audio>
         </div>
     </div>
@@ -265,7 +265,7 @@
             draw(ctx, cornerRadius) {
                 ctx.strokeStyle = '#34495e';
                 this.segments.forEach((segment, index) => {
-                    ctx.fillStyle = index === 0 ? '#1abc9c' : '#16a085';
+                    ctx.fillStyle = index === 0 ? Game.COLORS.SNAKE_HEAD : Game.COLORS.SNAKE_BODY;
                     Game.drawRoundedRect(ctx, segment.x, segment.y, this.box, this.box, cornerRadius);
                     ctx.fill();
                     ctx.stroke();
@@ -296,7 +296,7 @@
             }
 
             draw(ctx, effect, effectTimer, duration, box) {
-                ctx.fillStyle = '#e67e22';
+                ctx.fillStyle = Game.COLORS.FOOD;
                 let foodSize = box / 2.5;
                 if (effect && effectTimer > 0) {
                     const scaleFactor = 1 + 0.2 * (effectTimer / duration);
@@ -326,6 +326,7 @@
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 const dpr = window.devicePixelRatio || 1;
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
                 this.canvas.width = this.canvasSize * dpr;
                 this.canvas.height = this.canvasSize * dpr;
                 this.canvas.style.width = `${this.canvasSize}px`;
@@ -483,6 +484,7 @@
             handleResize() {
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 const dpr = window.devicePixelRatio || 1;
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
                 this.canvas.width = this.canvasSize * dpr;
                 this.canvas.height = this.canvasSize * dpr;
                 this.canvas.style.width = `${this.canvasSize}px`;
