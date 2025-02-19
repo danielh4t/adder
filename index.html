@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Code Structure</title>
+    <title>Snake Game with Improved Maintainability</title>
     <style>
         * {
             margin: 0;
@@ -192,10 +192,10 @@
                 </div>
             </div>
             <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAA=="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -394,12 +394,12 @@
             }
 
             updateScore() {
-                this.scoreElement.innerText = `Score: ${this.score}`;
+                this.scoreElement.textContent = `Score: ${this.score}`;
                 if (this.score > this.highScore) {
                     this.highScore = this.score;
                     localStorage.setItem('highScore', this.highScore);
                 }
-                this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+                this.highScoreElement.textContent = `High Score: ${this.highScore}`;
             }
 
             showGameOver() {
@@ -600,8 +600,10 @@
             }
         }
 
-        const game = new Game();
-        game.showStartScreen();
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new Game();
+            game.showStartScreen();
+        });
     </script>
 </body>
 
