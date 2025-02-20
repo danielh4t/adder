@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Improved Maintainability</title>
+    <title>Snake Game with Pause Functionality</title>
     <style>
         * {
             margin: 0;
@@ -144,6 +144,20 @@
             color: #fff;
         }
 
+        .control-button.pause-button {
+            width: 70px;
+            height: 70px;
+            font-size: 24px;
+            background: #e74c3c;
+            border-color: #c0392b;
+            color: #e74c3c;
+        }
+
+        .control-button.pause-button:active {
+            background: rgba(231, 76, 60, 0.3);
+            color: #fff;
+        }
+
         @media (min-width: 600px) {
             .control-button {
                 width: 70px;
@@ -161,6 +175,12 @@
             .start-screen button {
                 font-size: 20px;
                 padding: 14px 30px;
+            }
+
+            .control-button.pause-button {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
             }
         }
     </style>
@@ -190,12 +210,13 @@
                     <button class="control-button" data-direction="DOWN">↓</button>
                     <button class="control-button" data-direction="RIGHT">→</button>
                 </div>
+                <button class="control-button pause-button" id="pauseButton">⏸️</button>
             </div>
             <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -343,6 +364,7 @@
                 this.startButton = document.getElementById('startButton');
                 this.controls = document.getElementById('controls');
                 this.controlButtons = document.querySelectorAll('.control-button');
+                this.pauseButton = document.getElementById('pauseButton');
                 this.eatSound = document.getElementById('eatSound');
                 this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
@@ -391,6 +413,7 @@
                 this.hideStartScreen();
                 this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
+                this.pauseButton.textContent = '⏸️';
             }
 
             updateScore() {
@@ -444,9 +467,12 @@
                 this.controlButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const direction = button.getAttribute('data-direction');
-                        this.snake.enqueueDirection(direction);
+                        if (direction) {
+                            this.snake.enqueueDirection(direction);
+                        }
                     });
                 });
+                this.pauseButton.addEventListener('click', () => this.togglePause());
                 window.addEventListener('resize', this.handleResize.bind(this));
             }
 
@@ -501,15 +527,25 @@
             }
 
             pause() {
-                this.isPaused = true;
-                this.stopLoop();
-                this.drawPauseScreen();
+                if (!this.isPaused) {
+                    this.isPaused = true;
+                    this.stopLoop();
+                    this.drawPauseScreen();
+                    this.pauseButton.textContent = '▶️';
+                }
             }
 
             resume() {
-                this.isPaused = false;
-                this.lastFrameTime = performance.now();
-                this.startLoop();
+                if (this.isPaused) {
+                    this.isPaused = false;
+                    this.lastFrameTime = performance.now();
+                    this.startLoop();
+                    this.pauseButton.textContent = '⏸️';
+                }
+            }
+
+            togglePause() {
+                this.isPaused ? this.resume() : this.pause();
             }
 
             drawPauseScreen() {
