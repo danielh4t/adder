@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Optimized Collision Detection</title>
+    <title>Snake Game with Sound Toggle</title>
     <style>
         * {
             margin: 0;
@@ -144,7 +144,8 @@
             color: #fff;
         }
 
-        .control-button.pause-button {
+        .control-button.pause-button,
+        .control-button.sound-button {
             width: 70px;
             height: 70px;
             font-size: 24px;
@@ -153,7 +154,8 @@
             color: #e74c3c;
         }
 
-        .control-button.pause-button:active {
+        .control-button.pause-button:active,
+        .control-button.sound-button:active {
             background: rgba(231, 76, 60, 0.3);
             color: #fff;
         }
@@ -177,7 +179,8 @@
                 padding: 14px 30px;
             }
 
-            .control-button.pause-button {
+            .control-button.pause-button,
+            .control-button.sound-button {
                 width: 80px;
                 height: 80px;
                 font-size: 28px;
@@ -211,9 +214,10 @@
                     <button class="control-button" data-direction="RIGHT">→</button>
                 </div>
                 <button class="control-button pause-button" id="pauseButton">⏸️</button>
+                <button class="control-button sound-button" id="soundButton">🔊</button>
             </div>
             <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
                 src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
@@ -368,6 +372,7 @@
                 this.controls = document.getElementById('controls');
                 this.controlButtons = document.querySelectorAll('.control-button');
                 this.pauseButton = document.getElementById('pauseButton');
+                this.soundButton = document.getElementById('soundButton');
                 this.eatSound = document.getElementById('eatSound');
                 this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
@@ -410,6 +415,7 @@
                 this.foodEffect = false;
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
+                this.isSoundOn = true;
                 this.lastFrameTime = 0;
                 this.accumulatedTime = 0;
                 this.hideGameOver();
@@ -417,6 +423,9 @@
                 this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
                 this.pauseButton.textContent = '⏸️';
+                this.soundButton.textContent = '🔊';
+                this.eatSound.muted = false;
+                this.gameOverSound.muted = false;
             }
 
             updateScore() {
@@ -476,6 +485,7 @@
                     });
                 });
                 this.pauseButton.addEventListener('click', () => this.togglePause());
+                this.soundButton.addEventListener('click', () => this.toggleSound());
                 window.addEventListener('resize', this.handleResize.bind(this));
             }
 
@@ -551,6 +561,13 @@
                 this.isPaused ? this.resume() : this.pause();
             }
 
+            toggleSound() {
+                this.isSoundOn = !this.isSoundOn;
+                this.eatSound.muted = !this.isSoundOn;
+                this.gameOverSound.muted = !this.isSoundOn;
+                this.soundButton.textContent = this.isSoundOn ? '🔊' : '🔇';
+            }
+
             drawPauseScreen() {
                 this.ctx.fillStyle = GAME_CONSTANTS.COLORS.PAUSE_OVERLAY;
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -577,8 +594,10 @@
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = GAME_CONSTANTS.FOOD_EFFECT_DURATION;
-                    this.eatSound.currentTime = 0;
-                    this.eatSound.play();
+                    if (this.isSoundOn) {
+                        this.eatSound.currentTime = 0;
+                        this.eatSound.play();
+                    }
                 } else {
                     this.snake.pop();
                 }
