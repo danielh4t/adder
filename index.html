@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Code Structure</title>
+    <title>Snake Game with Improved Maintainability</title>
     <style>
         * {
             margin: 0;
@@ -410,7 +410,7 @@
                     this.restartButton = document.getElementById('restartButton');
                     this.startButton = document.getElementById('startButton');
                     this.controls = document.getElementById('controls');
-                    this.controlButtons = document.querySelectorAll('.control-button');
+                    this.controlButtons = document.querySelectorAll('.control-button[data-direction]');
                     this.pauseButton = document.getElementById('pauseButton');
                     this.soundButton = document.getElementById('soundButton');
                     this.fullscreenButton = document.getElementById('fullscreenButton');
