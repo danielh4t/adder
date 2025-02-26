@@ -4,8 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Improved Maintainability</title>
+    <title>Snake Game with Enhanced CSS Maintainability</title>
     <style>
+        :root {
+            --game-background: #34495e;
+            --snake-head: #1abc9c;
+            --snake-body: #16a085;
+            --food: #e67e22;
+            --border: #34495e;
+            --pause-overlay: rgba(0, 0, 0, 0.5);
+            --pause-text: #ecf0f1;
+            --game-over-bg: rgba(0, 0, 0, 0.85);
+            --game-over-text: #ecf0f1;
+            --button-bg: #1abc9c;
+            --button-hover-bg: #16a085;
+            --button-active-bg: rgba(26, 188, 156, 0.3);
+            --button-active-color: #fff;
+            --special-button-bg: #e74c3c;
+            --special-button-hover-bg: rgba(231, 76, 60, 0.3);
+            --special-button-color: #e74c3c;
+            --special-button-active-color: #fff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +49,7 @@
             height: 90vw;
             max-width: 600px;
             max-height: 600px;
-            background: #34495e;
+            background: var(--game-background);
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
             border-radius: 15px;
@@ -62,12 +82,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
+            background: var(--game-over-bg);
             padding: 40px 60px;
             border-radius: 20px;
             text-align: center;
             font-size: 24px;
-            color: #fff;
+            color: var(--game-over-text);
             display: none;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
             animation: fadeIn 0.5s ease;
@@ -89,7 +109,7 @@
         .start-screen button {
             margin-top: 20px;
             padding: 12px 25px;
-            background: #1abc9c;
+            background: var(--button-bg);
             color: #fff;
             border: none;
             border-radius: 12px;
@@ -101,7 +121,7 @@
 
         .game-over button:hover,
         .start-screen button:hover {
-            background: #16a085;
+            background: var(--button-hover-bg);
             transform: translateY(-2px);
         }
 
@@ -127,10 +147,10 @@
             height: 60px;
             margin: 8px;
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #1abc9c;
+            border: 2px solid var(--button-bg);
             border-radius: 15px;
             font-size: 28px;
-            color: #1abc9c;
+            color: var(--button-bg);
             cursor: pointer;
             transition: background 0.3s ease, transform 0.2s ease, color 0.3s ease;
             display: flex;
@@ -139,9 +159,9 @@
         }
 
         .control-button:active {
-            background: rgba(26, 188, 156, 0.3);
+            background: var(--button-active-bg);
             transform: scale(0.95);
-            color: #fff;
+            color: var(--button-active-color);
         }
 
         .control-button.pause-button,
@@ -150,16 +170,16 @@
             width: 70px;
             height: 70px;
             font-size: 24px;
-            background: #e74c3c;
-            border-color: #c0392b;
-            color: #e74c3c;
+            background: var(--special-button-bg);
+            border-color: darken(var(--special-button-bg), 10%);
+            color: var(--special-button-color);
         }
 
         .control-button.pause-button:active,
         .control-button.sound-button:active,
         .control-button.fullscreen-button:active {
-            background: rgba(231, 76, 60, 0.3);
-            color: #fff;
+            background: var(--special-button-hover-bg);
+            color: var(--special-button-active-color);
         }
 
         @media (min-width: 600px) {
@@ -221,10 +241,10 @@
                 <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
             </div>
             <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -232,17 +252,17 @@
         (function () {
             const GAME_CONSTANTS = {
                 COLORS: {
-                    GAME_BACKGROUND: '#34495e',
-                    SNAKE_HEAD: '#1abc9c',
-                    SNAKE_BODY: '#16a085',
-                    FOOD: '#e67e22',
-                    BORDER: '#34495e',
-                    PAUSE_OVERLAY: 'rgba(0, 0, 0, 0.5)',
-                    PAUSE_TEXT: '#ecf0f1',
-                    GAME_OVER_BG: 'rgba(0, 0, 0, 0.85)',
-                    GAME_OVER_TEXT: '#ecf0f1',
-                    BUTTON_BG: '#1abc9c',
-                    BUTTON_HOVER_BG: '#16a085'
+                    GAME_BACKGROUND: getComputedStyle(document.documentElement).getPropertyValue('--game-background').trim(),
+                    SNAKE_HEAD: getComputedStyle(document.documentElement).getPropertyValue('--snake-head').trim(),
+                    SNAKE_BODY: getComputedStyle(document.documentElement).getPropertyValue('--snake-body').trim(),
+                    FOOD: getComputedStyle(document.documentElement).getPropertyValue('--food').trim(),
+                    BORDER: getComputedStyle(document.documentElement).getPropertyValue('--border').trim(),
+                    PAUSE_OVERLAY: getComputedStyle(document.documentElement).getPropertyValue('--pause-overlay').trim(),
+                    PAUSE_TEXT: getComputedStyle(document.documentElement).getPropertyValue('--pause-text').trim(),
+                    GAME_OVER_BG: getComputedStyle(document.documentElement).getPropertyValue('--game-over-bg').trim(),
+                    GAME_OVER_TEXT: getComputedStyle(document.documentElement).getPropertyValue('--game-over-text').trim(),
+                    BUTTON_BG: getComputedStyle(document.documentElement).getPropertyValue('--button-bg').trim(),
+                    BUTTON_HOVER_BG: getComputedStyle(document.documentElement).getPropertyValue('--button-hover-bg').trim()
                 },
                 INITIAL_SPEED: 150,
                 SPEED_INCREMENT: 5,
