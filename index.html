@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced CSS Maintainability</title>
+    <title>Snake Game with Improved CSS Border Variables</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -24,6 +24,7 @@
             --special-button-hover-bg: rgba(231, 76, 60, 0.3);
             --special-button-color: #e74c3c;
             --special-button-active-color: #fff;
+            --special-button-border: #c0392b;
         }
 
         * {
@@ -171,7 +172,7 @@
             height: 70px;
             font-size: 24px;
             background: var(--special-button-bg);
-            border-color: darken(var(--special-button-bg), 10%);
+            border-color: var(--special-button-border);
             color: var(--special-button-color);
         }
 
