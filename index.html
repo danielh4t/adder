@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efficient Snake Game with Automatic Pause on Tab Switch</title>
+    <title>Optimized Snake Game with Improved Collision Detection</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -274,8 +274,9 @@ AAAAAAAAAA="
         }
 
         class Snake {
-            constructor(box) {
+            constructor(box, numCols) {
                 this.box = box;
+                this.numCols = numCols;
                 this.reset();
             }
 
@@ -284,7 +285,11 @@ AAAAAAAAAA="
                 this.direction = 'RIGHT';
                 this.directionQueue = [];
                 this.positions = new Set();
-                this.positions.add(`${this.segments[0].x},${this.segments[0].y}`);
+                this.positions.add(this.computeIndex(this.segments[0].x, this.segments[0].y));
+            }
+
+            computeIndex(x, y) {
+                return (x / this.box) + (y / this.box) * this.numCols;
             }
 
             enqueueDirection(newDirection) {
@@ -325,13 +330,13 @@ AAAAAAAAAA="
                 }
                 const head = this.getNextHeadPosition();
                 this.segments.unshift(head);
-                this.positions.add(`${head.x},${head.y}`);
+                this.positions.add(this.computeIndex(head.x, head.y));
                 return head;
             }
 
             pop() {
                 const tail = this.segments.pop();
-                this.positions.delete(`${tail.x},${tail.y}`);
+                this.positions.delete(this.computeIndex(tail.x, tail.y));
             }
 
             isCollision() {
@@ -350,25 +355,27 @@ AAAAAAAAAA="
         }
 
         class Food {
-            constructor(box, canvasWidth, canvasHeight, snakeSegments) {
+            constructor(box, canvasWidth, canvasHeight, snakeSegments, numCols) {
                 this.box = box;
                 this.canvasWidth = canvasWidth;
                 this.canvasHeight = canvasHeight;
                 this.snakeSegments = snakeSegments;
+                this.numCols = numCols;
                 this.generate();
             }
 
             generate() {
-                let foodX, foodY;
+                let foodX, foodY, index;
                 do {
                     foodX = Math.floor((Math.random() * this.canvasWidth) / this.box) * this.box;
                     foodY = Math.floor((Math.random() * this.canvasHeight) / this.box) * this.box;
-                } while (this.isOnSnake(foodX, foodY));
+                    index = (foodX / this.box) + (foodY / this.box) * this.numCols;
+                } while (this.isOnSnake(index));
                 this.position = { x: foodX, y: foodY };
             }
 
-            isOnSnake(x, y) {
-                return this.snakeSegments.some(segment => segment.x === x && segment.y === y);
+            isOnSnake(index) {
+                return this.snakeSegments.some(segment => (segment.x / this.box) + (segment.y / this.box) * this.numCols === index);
             }
 
             draw(ctx, effect, effectTimer, duration, box) {
@@ -440,6 +447,7 @@ AAAAAAAAAA="
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.setupCanvas();
+                this.numCols = this.canvasSize / this.box;
                 this.reset();
                 this.addEventListeners();
             }
@@ -457,10 +465,10 @@ AAAAAAAAAA="
             reset() {
                 this.score = 0;
                 this.speed = Constants.INITIAL_SPEED;
-                this.snake = new Snake(this.box);
+                this.snake = new Snake(this.box, this.numCols);
                 const canvasWidth = this.canvas.width / (window.devicePixelRatio || 1);
                 const canvasHeight = this.canvas.height / (window.devicePixelRatio || 1);
-                this.food = new Food(this.box, canvasWidth, canvasHeight, this.snake.segments);
+                this.food = new Food(this.box, canvasWidth, canvasHeight, this.snake.segments, this.numCols);
                 this.foodEffect = false;
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
@@ -595,6 +603,7 @@ AAAAAAAAAA="
             handleResize() {
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.setupCanvas();
+                this.numCols = this.canvasSize / this.box;
                 this.box = this.canvasSize / Constants.BOX_DIVISOR;
                 this.reset();
             }
@@ -657,7 +666,7 @@ AAAAAAAAAA="
                 if (head.x === this.food.position.x && head.y === this.food.position.y) {
                     this.score += 10;
                     this.updateScore();
-                    this.food = new Food(this.box, this.canvas.width / (window.devicePixelRatio || 1), this.canvas.height / (window.devicePixelRatio || 1), this.snake.segments);
+                    this.food = new Food(this.box, this.canvas.width / (window.devicePixelRatio || 1), this.canvas.height / (window.devicePixelRatio || 1), this.snake.segments, this.numCols);
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = Constants.FOOD_EFFECT_DURATION;
