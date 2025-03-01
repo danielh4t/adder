@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintainable Snake Game with Modular JavaScript</title>
+    <title>Efficient Snake Game with Automatic Pause on Tab Switch</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -242,10 +242,11 @@
                 <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
             </div>
             <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA
+AAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -537,6 +538,13 @@
                 this.soundButton.addEventListener('click', () => this.toggleSound());
                 this.fullscreenButton.addEventListener('click', () => this.toggleFullScreen());
                 window.addEventListener('resize', this.handleResize.bind(this));
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        if (!this.isPaused) {
+                            this.pause();
+                        }
+                    }
+                });
             }
 
             handleKeyDown(event) {
