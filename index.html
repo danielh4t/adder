@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimized Snake Game with Improved Collision Detection</title>
+    <title>Snake Game with Enhanced Code Maintainability</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -246,7 +246,7 @@
 AAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -604,7 +604,6 @@ AAAAAAAAAA="
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.setupCanvas();
                 this.numCols = this.canvasSize / this.box;
-                this.box = this.canvasSize / Constants.BOX_DIVISOR;
                 this.reset();
             }
 
