@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Improved Code Structure</title>
+    <title>Snake Game with Optimized Rendering Performance</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -286,7 +286,7 @@
 AAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
+                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAAAA="
                 preload="auto"></audio>
         </div>
     </div>
@@ -500,6 +500,8 @@ AAAAAAAAAA="
                 this.canvas.style.width = `${this.canvasSize}px`;
                 this.canvas.style.height = `${this.canvasSize}px`;
                 this.renderer.ctx.scale(dpr, dpr);
+                this.scaledWidth = this.canvas.width / dpr;
+                this.scaledHeight = this.canvas.height / dpr;
             }
 
             reset() {
@@ -691,9 +693,7 @@ AAAAAAAAAA="
             }
 
             drawPauseScreen() {
-                const scaledWidth = this.canvas.width / (window.devicePixelRatio || 1);
-                const scaledHeight = this.canvas.height / (window.devicePixelRatio || 1);
-                this.renderer.drawPauseOverlay(scaledWidth, scaledHeight);
+                this.renderer.drawPauseOverlay(this.scaledWidth, this.scaledHeight);
             }
 
             update() {
@@ -707,7 +707,7 @@ AAAAAAAAAA="
                 if (head.x === this.food.position.x && head.y === this.food.position.y) {
                     this.score += 10;
                     this.updateScore();
-                    this.food = new Food(this.box, this.canvas.width / (window.devicePixelRatio || 1), this.canvas.height / (window.devicePixelRatio || 1), this.snake.segments, this.numCols);
+                    this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols);
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = Constants.FOOD_EFFECT_DURATION;
@@ -723,9 +723,7 @@ AAAAAAAAAA="
             }
 
             checkCollision(head) {
-                const canvasWidth = this.canvas.width / (window.devicePixelRatio || 1);
-                const canvasHeight = this.canvas.height / (window.devicePixelRatio || 1);
-                return head.x < 0 || head.x >= canvasWidth || head.y < 0 || head.y >= canvasHeight || this.snake.isCollision();
+                return head.x < 0 || head.x >= this.scaledWidth || head.y < 0 || head.y >= this.scaledHeight || this.snake.isCollision();
             }
 
             increaseSpeed() {
@@ -733,9 +731,7 @@ AAAAAAAAAA="
             }
 
             draw() {
-                const scaledWidth = this.canvas.width / (window.devicePixelRatio || 1);
-                const scaledHeight = this.canvas.height / (window.devicePixelRatio || 1);
-                this.renderer.clear(scaledWidth, scaledHeight);
+                this.renderer.clear(this.scaledWidth, this.scaledHeight);
                 this.food.draw(this.renderer.ctx, this.foodEffect, this.foodEffectTimer, Constants.FOOD_EFFECT_DURATION, this.box);
                 this.snake.draw(this.renderer.ctx, 5);
                 if (this.foodEffect && this.foodEffectTimer > 0) {
