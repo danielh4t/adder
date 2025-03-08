@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Improved Code Maintainability</title>
+    <title>Snake Game with Enhanced High Score Feedback</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -81,6 +81,20 @@
         .score {
             margin-bottom: 5px;
             text-shadow: 1px 1px 2px #000;
+        }
+
+        .new-high-score {
+            animation: highlight 1s;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: yellow;
+            }
+
+            100% {
+                background-color: transparent;
+            }
         }
 
         .game-over,
@@ -283,7 +297,7 @@
             </div>
             <audio id="eatSound"
                 src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAA
-    AAAAAAAAAA="
+        AAAAAAAAAA="
                 preload="auto"></audio>
             <audio id="gameOverSound"
                 src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAXGluZwAAAA8AAAACAAACcQCAgICAgIC8="
@@ -542,8 +556,12 @@
                 if (this.score > this.highScore) {
                     this.highScore = this.score;
                     localStorage.setItem('highScore', this.highScore);
+                    this.highScoreElement.textContent = `High Score: ${this.highScore}`;
+                    this.highScoreElement.classList.add('new-high-score');
+                    setTimeout(() => this.highScoreElement.classList.remove('new-high-score'), 1000);
+                } else {
+                    this.highScoreElement.textContent = `High Score: ${this.highScore}`;
                 }
-                this.highScoreElement.textContent = `High Score: ${this.highScore}`;
             }
 
             showGameOver() {
