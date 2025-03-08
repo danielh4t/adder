@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Cached Rendering Paths</title>
+    <title>Snake Game with Improved Code Maintainability</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -472,10 +472,6 @@
                 this.ctx.fill(path);
                 this.ctx.stroke(path);
                 this.ctx.restore();
-            }
-
-            static drawRoundedRect(ctx, x, y, width, height, radius) {
-                // Deprecated: Removed static method in favor of instance method
             }
         }
 
