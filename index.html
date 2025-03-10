@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced High Score Feedback</title>
+    <title>Snake Game with Audio Removed for Functionality</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -212,7 +212,6 @@
         }
 
         .control-button.pause-button,
-        .control-button.sound-button,
         .control-button.fullscreen-button {
             width: 70px;
             height: 70px;
@@ -224,14 +223,12 @@
         }
 
         .control-button.pause-button:hover,
-        .control-button.sound-button:hover,
         .control-button.fullscreen-button:hover {
             background: var(--special-button-hover-bg);
             border-color: var(--special-button-border);
         }
 
         .control-button.pause-button:active,
-        .control-button.sound-button:active,
         .control-button.fullscreen-button:active {
             background: var(--special-button-hover-bg);
             color: var(--special-button-active-color);
@@ -257,7 +254,6 @@
             }
 
             .control-button.pause-button,
-            .control-button.sound-button,
             .control-button.fullscreen-button {
                 width: 80px;
                 height: 80px;
@@ -292,16 +288,8 @@
                     <button class="control-button" data-direction="RIGHT">→</button>
                 </div>
                 <button class="control-button pause-button" id="pauseButton">⏸️</button>
-                <button class="control-button sound-button" id="soundButton">🔊</button>
                 <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
             </div>
-            <audio id="eatSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAA
-        AAAAAAAAAA="
-                preload="auto"></audio>
-            <audio id="gameOverSound"
-                src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAAXGluZwAAAA8AAAACAAACcQCAgICAgIC8="
-                preload="auto"></audio>
         </div>
     </div>
     <script>
@@ -503,10 +491,7 @@
                 this.controls = document.getElementById('controls');
                 this.controlButtons = document.querySelectorAll('.control-button[data-direction]');
                 this.pauseButton = document.getElementById('pauseButton');
-                this.soundButton = document.getElementById('soundButton');
                 this.fullscreenButton = document.getElementById('fullscreenButton');
-                this.eatSound = document.getElementById('eatSound');
-                this.gameOverSound = document.getElementById('gameOverSound');
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.setupCanvas();
@@ -537,7 +522,6 @@
                 this.foodEffect = false;
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
-                this.isSoundOn = true;
                 this.lastFrameTime = 0;
                 this.accumulatedTime = 0;
                 this.hideGameOver();
@@ -545,10 +529,7 @@
                 this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
                 this.updateScore();
                 this.pauseButton.textContent = '⏸️';
-                this.soundButton.textContent = '🔊';
                 this.fullscreenButton.textContent = '⛶';
-                this.eatSound.muted = false;
-                this.gameOverSound.muted = false;
             }
 
             updateScore() {
@@ -567,7 +548,6 @@
             showGameOver() {
                 this.gameOverElement.style.display = 'block';
                 this.gameOverElement.style.animation = 'fadeInScale 0.5s forwards';
-                this.gameOverSound.play();
             }
 
             hideGameOver() {
@@ -614,7 +594,6 @@
                     });
                 });
                 this.pauseButton.addEventListener('click', () => this.togglePause());
-                this.soundButton.addEventListener('click', () => this.toggleSound());
                 this.fullscreenButton.addEventListener('click', () => this.toggleFullScreen());
                 window.addEventListener('resize', this.handleResize.bind(this));
                 document.addEventListener('visibilitychange', () => {
@@ -700,13 +679,6 @@
                 this.isPaused ? this.resume() : this.pause();
             }
 
-            toggleSound() {
-                this.isSoundOn = !this.isSoundOn;
-                this.eatSound.muted = !this.isSoundOn;
-                this.gameOverSound.muted = !this.isSoundOn;
-                this.soundButton.textContent = this.isSoundOn ? '🔊' : '🔇';
-            }
-
             toggleFullScreen() {
                 if (!document.fullscreenElement) {
                     this.container.requestFullscreen().catch(err => {
@@ -738,10 +710,6 @@
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = Constants.FOOD_EFFECT_DURATION;
-                    if (this.isSoundOn) {
-                        this.eatSound.currentTime = 0;
-                        this.eatSound.play();
-                    }
                 } else {
                     this.snake.pop();
                 }
