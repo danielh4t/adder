@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Audio Removed for Functionality</title>
+    <title>Snake Game with Enhanced Audio</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -265,6 +265,9 @@
 
 <body>
     <div>
+        <audio id="bgm" src="https://example.com/background-music.mp3" loop></audio>
+        <audio id="eatSound" src="https://example.com/eat-sound.mp3"></audio>
+        <audio id="gameOverSound" src="https://example.com/game-over-sound.mp3"></audio>
         <div class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
@@ -530,6 +533,11 @@
                 this.updateScore();
                 this.pauseButton.textContent = '⏸️';
                 this.fullscreenButton.textContent = '⛶';
+                this.bgm = document.getElementById('bgm');
+                this.eatSound = document.getElementById('eatSound');
+                this.gameOverSound = document.getElementById('gameOverSound');
+                this.bgm.volume = 0.5;
+                this.bgm.play();
             }
 
             updateScore() {
@@ -548,6 +556,8 @@
             showGameOver() {
                 this.gameOverElement.style.display = 'block';
                 this.gameOverElement.style.animation = 'fadeInScale 0.5s forwards';
+                this.bgm.pause();
+                this.gameOverSound.play();
             }
 
             hideGameOver() {
@@ -558,6 +568,7 @@
                 this.startScreen.style.display = 'block';
                 this.startScreen.style.animation = 'fadeInScale 0.5s forwards';
                 this.stopLoop();
+                this.bgm.pause();
             }
 
             hideStartScreen() {
@@ -571,6 +582,7 @@
 
             startGame() {
                 this.reset();
+                this.hideStartScreen();
                 this.startLoop();
             }
 
@@ -663,6 +675,7 @@
                     this.stopLoop();
                     this.drawPauseScreen();
                     this.pauseButton.textContent = '▶️';
+                    this.bgm.pause();
                 }
             }
 
@@ -672,6 +685,7 @@
                     this.lastFrameTime = performance.now();
                     this.startLoop();
                     this.pauseButton.textContent = '⏸️';
+                    this.bgm.play();
                 }
             }
 
@@ -710,6 +724,7 @@
                     this.increaseSpeed();
                     this.foodEffect = true;
                     this.foodEffectTimer = Constants.FOOD_EFFECT_DURATION;
+                    this.eatSound.play();
                 } else {
                     this.snake.pop();
                 }
