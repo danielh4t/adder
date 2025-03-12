@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Audio</title>
+    <title>Snake Game with Sound Control</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -212,7 +212,8 @@
         }
 
         .control-button.pause-button,
-        .control-button.fullscreen-button {
+        .control-button.fullscreen-button,
+        .control-button.sound-button {
             width: 70px;
             height: 70px;
             font-size: 24px;
@@ -223,13 +224,15 @@
         }
 
         .control-button.pause-button:hover,
-        .control-button.fullscreen-button:hover {
+        .control-button.fullscreen-button:hover,
+        .control-button.sound-button:hover {
             background: var(--special-button-hover-bg);
             border-color: var(--special-button-border);
         }
 
         .control-button.pause-button:active,
-        .control-button.fullscreen-button:active {
+        .control-button.fullscreen-button:active,
+        .control-button.sound-button:active {
             background: var(--special-button-hover-bg);
             color: var(--special-button-active-color);
         }
@@ -254,7 +257,8 @@
             }
 
             .control-button.pause-button,
-            .control-button.fullscreen-button {
+            .control-button.fullscreen-button,
+            .control-button.sound-button {
                 width: 80px;
                 height: 80px;
                 font-size: 28px;
@@ -292,6 +296,7 @@
                 </div>
                 <button class="control-button pause-button" id="pauseButton">⏸️</button>
                 <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
+                <button class="control-button sound-button" id="soundButton">🔊</button>
             </div>
         </div>
     </div>
@@ -495,6 +500,7 @@
                 this.controlButtons = document.querySelectorAll('.control-button[data-direction]');
                 this.pauseButton = document.getElementById('pauseButton');
                 this.fullscreenButton = document.getElementById('fullscreenButton');
+                this.soundButton = document.getElementById('soundButton');
                 this.box = 20;
                 this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
                 this.setupCanvas();
@@ -525,6 +531,7 @@
                 this.foodEffect = false;
                 this.foodEffectTimer = 0;
                 this.isPaused = false;
+                this.isMuted = false;
                 this.lastFrameTime = 0;
                 this.accumulatedTime = 0;
                 this.hideGameOver();
@@ -533,6 +540,7 @@
                 this.updateScore();
                 this.pauseButton.textContent = '⏸️';
                 this.fullscreenButton.textContent = '⛶';
+                this.soundButton.textContent = '🔊';
                 this.bgm = document.getElementById('bgm');
                 this.eatSound = document.getElementById('eatSound');
                 this.gameOverSound = document.getElementById('gameOverSound');
@@ -607,6 +615,7 @@
                 });
                 this.pauseButton.addEventListener('click', () => this.togglePause());
                 this.fullscreenButton.addEventListener('click', () => this.toggleFullScreen());
+                this.soundButton.addEventListener('click', () => this.toggleSound());
                 window.addEventListener('resize', this.handleResize.bind(this));
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
@@ -685,7 +694,9 @@
                     this.lastFrameTime = performance.now();
                     this.startLoop();
                     this.pauseButton.textContent = '⏸️';
-                    this.bgm.play();
+                    if (!this.isMuted) {
+                        this.bgm.play();
+                    }
                 }
             }
 
@@ -703,6 +714,14 @@
                     document.exitFullscreen();
                     this.fullscreenButton.textContent = '⛶';
                 }
+            }
+
+            toggleSound() {
+                this.isMuted = !this.isMuted;
+                this.bgm.muted = this.isMuted;
+                this.eatSound.muted = this.isMuted;
+                this.gameOverSound.muted = this.isMuted;
+                this.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
             }
 
             drawPauseScreen() {
