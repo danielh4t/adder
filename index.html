@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Sound Control</title>
+    <title>Snake Game with Optimized Audio Loading</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -269,9 +269,9 @@
 
 <body>
     <div>
-        <audio id="bgm" src="https://example.com/background-music.mp3" loop></audio>
-        <audio id="eatSound" src="https://example.com/eat-sound.mp3"></audio>
-        <audio id="gameOverSound" src="https://example.com/game-over-sound.mp3"></audio>
+        <audio id="bgm" src="https://example.com/background-music.mp3" loop preload="auto"></audio>
+        <audio id="eatSound" src="https://example.com/eat-sound.mp3" preload="auto"></audio>
+        <audio id="gameOverSound" src="https://example.com/game-over-sound.mp3" preload="auto"></audio>
         <div class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
