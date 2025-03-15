@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Optimized Rendering for Better Performance</title>
+    <title>Snake Game with Enhanced User Interface</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -27,6 +27,7 @@
             --special-button-border: #c0392b;
             --transition-duration: 0.3s;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --animation-duration: 0.5s;
         }
 
         * {
@@ -263,6 +264,25 @@
                 height: 80px;
                 font-size: 28px;
             }
+        }
+
+        /* Enhanced UI Animations */
+        .game-over,
+        .start-screen {
+            animation: fadeInScale var(--animation-duration) forwards;
+        }
+
+        .control-button:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--button-bg);
+        }
+
+        .score-container {
+            animation: fadeIn var(--animation-duration) ease;
+        }
+
+        .new-high-score {
+            animation: highlight 1s;
         }
     </style>
 </head>
@@ -800,10 +820,6 @@
                     Elements.gameOver.style.display = 'block';
                     this.saveHighScore();
                 }
-            }
-
-            class Game {
-                // ... (rest of the Game class remains unchanged)
             }
 
             const game = new Game();
