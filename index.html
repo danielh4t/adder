@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced Code Maintainability</title>
+    <title>Snake Game with Optimized Rendering for Better Performance</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -347,20 +347,24 @@
                 constructor(canvas) {
                     this.canvas = canvas;
                     this.ctx = this.canvas.getContext('2d');
+                    this.offscreenCanvas = document.createElement('canvas');
+                    this.offscreenCtx = this.offscreenCanvas.getContext('2d');
+                    this.offscreenCanvas.width = this.canvas.width;
+                    this.offscreenCanvas.height = this.canvas.height;
                     Renderer.roundedRectCache = new Map();
                 }
 
                 clear(width, height) {
-                    this.ctx.clearRect(0, 0, width, height);
+                    this.offscreenCtx.clearRect(0, 0, width, height);
                 }
 
                 drawPauseOverlay(width, height) {
-                    this.ctx.fillStyle = Constants.COLORS.PAUSE_OVERLAY;
-                    this.ctx.fillRect(0, 0, width, height);
-                    this.ctx.fillStyle = Constants.COLORS.PAUSE_TEXT;
-                    this.ctx.font = '48px Arial';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.fillText('Paused', width / 2, height / 2);
+                    this.offscreenCtx.fillStyle = Constants.COLORS.PAUSE_OVERLAY;
+                    this.offscreenCtx.fillRect(0, 0, width, height);
+                    this.offscreenCtx.fillStyle = Constants.COLORS.PAUSE_TEXT;
+                    this.offscreenCtx.font = '48px Arial';
+                    this.offscreenCtx.textAlign = 'center';
+                    this.offscreenCtx.fillText('Paused', width / 2, height / 2);
                 }
 
                 drawRoundedRect(x, y, width, height, radius) {
@@ -381,11 +385,16 @@
                         path.closePath();
                         Renderer.roundedRectCache.set(key, path);
                     }
-                    this.ctx.save();
-                    this.ctx.translate(x, y);
-                    this.ctx.fill(path);
-                    this.ctx.stroke(path);
-                    this.ctx.restore();
+                    this.offscreenCtx.save();
+                    this.offscreenCtx.translate(x, y);
+                    this.offscreenCtx.fill(path);
+                    this.offscreenCtx.stroke(path);
+                    this.offscreenCtx.restore();
+                }
+
+                renderOnscreen() {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.drawImage(this.offscreenCanvas, 0, 0);
                 }
             }
 
@@ -528,6 +537,8 @@
                     Elements.gameCanvas.style.width = `${this.canvasSize}px`;
                     Elements.gameCanvas.style.height = `${this.canvasSize}px`;
                     this.renderer.ctx.scale(dpr, dpr);
+                    this.renderer.offscreenCanvas.width = Elements.gameCanvas.width;
+                    this.renderer.offscreenCanvas.height = Elements.gameCanvas.height;
                     this.scaledWidth = Elements.gameCanvas.width / dpr;
                     this.scaledHeight = Elements.gameCanvas.height / dpr;
                 }
@@ -664,6 +675,7 @@
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
                         this.renderer.drawPauseOverlay(this.scaledWidth, this.scaledHeight);
+                        this.renderer.renderOnscreen();
                         Elements.pauseButton.textContent = '▶️';
                         Elements.bgm.pause();
                     }
@@ -766,8 +778,8 @@
 
                 render() {
                     this.renderer.clear(this.scaledWidth, this.scaledHeight);
-                    this.food.draw(this.renderer.ctx, this.foodEffect, this.foodEffectTimer, Constants.FOOD_EFFECT_DURATION, this.box);
-                    this.snake.draw(this.renderer.ctx, 5, this.renderer);
+                    this.food.draw(this.renderer.offscreenCtx, this.foodEffect, this.foodEffectTimer, Constants.FOOD_EFFECT_DURATION, this.box);
+                    this.snake.draw(this.renderer.offscreenCtx, 5, this.renderer);
                     if (this.foodEffect && this.foodEffectTimer > 0) {
                         this.foodEffectTimer--;
                         if (this.foodEffectTimer === 0) {
@@ -777,6 +789,7 @@
                     if (this.isPaused) {
                         this.renderer.drawPauseOverlay(this.scaledWidth, this.scaledHeight);
                     }
+                    this.renderer.renderOnscreen();
                 }
 
                 endGame() {
@@ -787,6 +800,10 @@
                     Elements.gameOver.style.display = 'block';
                     this.saveHighScore();
                 }
+            }
+
+            class Game {
+                // ... (rest of the Game class remains unchanged)
             }
 
             const game = new Game();
