@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Enhanced User Interface</title>
+    <title>Snake Game - Performance Optimized</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -341,6 +341,14 @@
                 controls: document.getElementById('controls'),
             };
 
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                }
+            }
+
             class Constants {
                 static COLORS = {
                     GAME_BACKGROUND: '#34495e',
@@ -625,7 +633,7 @@
                     Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
                     Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
-                    window.addEventListener('resize', this.handleResize.bind(this));
+                    window.addEventListener('resize', debounce(this.handleResize.bind(this), 200));
                     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                 }
 
