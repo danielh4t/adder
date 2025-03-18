@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Performance Optimized</title>
+    <title>Snake Game - Enhanced User Interface</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -28,6 +28,8 @@
             --transition-duration: 0.3s;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --animation-duration: 0.5s;
+            --modal-background: rgba(255, 255, 255, 0.1);
+            --modal-text: #ffffff;
         }
 
         * {
@@ -284,14 +286,66 @@
         .new-high-score {
             animation: highlight 1s;
         }
+
+        /* Modal Styles */
+        .modal {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            background: var(--modal-background);
+            padding: 20px 40px;
+            border-radius: 15px;
+            text-align: center;
+            color: var(--modal-text);
+            display: none;
+            z-index: 3;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .modal button {
+            padding: 10px 20px;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background var(--transition-duration) ease, transform 0.2s ease;
+        }
+
+        .modal button:hover {
+            background: var(--button-hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .modal button:active {
+            background: var(--button-active-bg);
+            transform: scale(0.95);
+        }
     </style>
 </head>
 
 <body>
     <div>
-        <audio id="bgm" src="https://example.com/background-music.mp3" loop preload="auto"></audio>
-        <audio id="eatSound" src="https://example.com/eat-sound.mp3" preload="auto"></audio>
-        <audio id="gameOverSound" src="https://example.com/game-over-sound.mp3" preload="auto"></audio>
+        <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_8e48699e2f.mp3?filename=background-music-115572.mp3" loop preload="auto"></audio>
+        <audio id="eatSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_bc1a7e80e3.mp3?filename=eating-sound-179445.mp3" preload="auto"></audio>
+        <audio id="gameOverSound" src="https://cdn.pixabay.com/download/audio/2022/12/10/audio_d8a1d5d7e4.mp3?filename=game-over-sound-153943.mp3" preload="auto"></audio>
         <div class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
@@ -318,6 +372,11 @@
                 <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
                 <button class="control-button sound-button" id="soundButton">🔊</button>
             </div>
+            <div class="modal" id="instructionsModal">
+                <h2>How to Play</h2>
+                <p>Control the snake using arrow keys or on-screen buttons. Eat food to grow and increase your score. Avoid hitting the walls or yourself!</p>
+                <button id="closeModalButton">Got It!</button>
+            </div>
         </div>
     </div>
     <script>
@@ -339,6 +398,8 @@
                 gameContainer: document.getElementById('gameContainer'),
                 gameCanvas: document.getElementById('gameCanvas'),
                 controls: document.getElementById('controls'),
+                instructionsModal: document.getElementById('instructionsModal'),
+                closeModalButton: document.getElementById('closeModalButton'),
             };
 
             function debounce(func, wait) {
@@ -610,12 +671,15 @@
 
                 setupAudio() {
                     Elements.bgm.volume = 0.5;
-                    Elements.bgm.play();
+                    Elements.bgm.play().catch(() => {
+                        // User interaction required to play audio
+                    });
                 }
 
                 hideElements() {
                     Elements.gameOver.style.display = 'none';
                     Elements.startScreen.style.display = 'none';
+                    Elements.instructionsModal.classList.add('active');
                 }
 
                 bindEvents() {
@@ -624,6 +688,7 @@
                     Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
                     Elements.restartButton.addEventListener('click', this.restart.bind(this));
                     Elements.startButton.addEventListener('click', this.start.bind(this));
+                    Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
                     Elements.controlButtons.forEach(button => {
                         button.addEventListener('click', () => {
                             const direction = button.getAttribute('data-direction');
@@ -742,6 +807,12 @@
                 start() {
                     this.reset();
                     Elements.startScreen.style.display = 'none';
+                    this.instructionsModal.classList.remove('active');
+                    this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                }
+
+                closeModal() {
+                    Elements.instructionsModal.classList.remove('active');
                     this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
                 }
 
