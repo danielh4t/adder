@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Optimized Rendering</title>
+    <title>Snake Game - Improved Accessibility</title>
     <style>
         :root {
             --game-background: #34495e;
@@ -354,28 +354,28 @@
             <canvas id="gameCanvas"></canvas>
             <div class="game-over" id="gameOver">
                 Game Over!<br>
-                <button id="restartButton">Restart</button>
+                <button id="restartButton" aria-label="Restart Game">Restart</button>
             </div>
             <div class="start-screen" id="startScreen">
                 <h2>Welcome to Snake Game</h2>
                 <p>Use Arrow Keys, Swipe or On-screen Buttons to Control the Snake</p>
-                <button id="startButton">Start Game</button>
+                <button id="startButton" aria-label="Start Game">Start Game</button>
             </div>
             <div class="controls" id="controls">
-                <button class="control-button" data-direction="UP">↑</button>
+                <button class="control-button" data-direction="UP" aria-label="Move Up">↑</button>
                 <div class="controls-row">
-                    <button class="control-button" data-direction="LEFT">←</button>
-                    <button class="control-button" data-direction="DOWN">↓</button>
-                    <button class="control-button" data-direction="RIGHT">→</button>
+                    <button class="control-button" data-direction="LEFT" aria-label="Move Left">←</button>
+                    <button class="control-button" data-direction="DOWN" aria-label="Move Down">↓</button>
+                    <button class="control-button" data-direction="RIGHT" aria-label="Move Right">→</button>
                 </div>
-                <button class="control-button pause-button" id="pauseButton">⏸️</button>
-                <button class="control-button fullscreen-button" id="fullscreenButton">⛶</button>
-                <button class="control-button sound-button" id="soundButton">🔊</button>
+                <button class="control-button pause-button" id="pauseButton" aria-label="Pause Game">⏸️</button>
+                <button class="control-button fullscreen-button" id="fullscreenButton" aria-label="Toggle Fullscreen">⛶</button>
+                <button class="control-button sound-button" id="soundButton" aria-label="Toggle Sound">🔊</button>
             </div>
             <div class="modal" id="instructionsModal">
                 <h2>How to Play</h2>
                 <p>Control the snake using arrow keys or on-screen buttons. Eat food to grow and increase your score. Avoid hitting the walls or yourself!</p>
-                <button id="closeModalButton">Got It!</button>
+                <button id="closeModalButton" aria-label="Close Instructions">Got It!</button>
             </div>
         </div>
     </div>
