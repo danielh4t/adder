@@ -4,27 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Accessibility</title>
+    <title>Snake Game - Enhanced Visual Design</title>
     <style>
         :root {
-            --game-background: #34495e;
-            --snake-head: #1abc9c;
-            --snake-body: #16a085;
-            --food: #e67e22;
-            --border: #2c3e50;
-            --pause-overlay: rgba(0, 0, 0, 0.5);
-            --pause-text: #ecf0f1;
-            --game-over-bg: rgba(0, 0, 0, 0.85);
-            --game-over-text: #ecf0f1;
-            --button-bg: #1abc9c;
-            --button-hover-bg: #16a085;
-            --button-active-bg: rgba(26, 188, 156, 0.3);
-            --button-active-color: #fff;
-            --special-button-bg: #e74c3c;
-            --special-button-hover-bg: rgba(231, 76, 60, 0.3);
-            --special-button-color: #e74c3c;
-            --special-button-active-color: #fff;
-            --special-button-border: #c0392b;
+            --game-background: #1e1e1e;
+            --snake-head: #00ff7f;
+            --snake-body: #32cd32;
+            --food: #ff4500;
+            --border: #ffffff;
+            --pause-overlay: rgba(0, 0, 0, 0.7);
+            --pause-text: #ffffff;
+            --game-over-bg: rgba(0, 0, 0, 0.9);
+            --game-over-text: #ffffff;
+            --button-bg: #00ff7f;
+            --button-hover-bg: #32cd32;
+            --button-active-bg: rgba(0, 255, 127, 0.3);
+            --button-active-color: #ffffff;
+            --special-button-bg: #ff4500;
+            --special-button-hover-bg: rgba(255, 69, 0, 0.3);
+            --special-button-color: #ff4500;
+            --special-button-active-color: #ffffff;
+            --special-button-border: #cc3700;
             --transition-duration: 0.3s;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --animation-duration: 0.5s;
@@ -40,7 +40,7 @@
 
         body {
             font-family: var(--font-family);
-            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            background: #121212;
             color: #ecf0f1;
             display: flex;
             justify-content: center;
@@ -412,17 +412,17 @@
 
             class Constants {
                 static COLORS = {
-                    GAME_BACKGROUND: '#34495e',
-                    SNAKE_HEAD: '#1abc9c',
-                    SNAKE_BODY: '#16a085',
-                    FOOD: '#e67e22',
-                    BORDER: '#2c3e50',
-                    PAUSE_OVERLAY: 'rgba(0, 0, 0, 0.5)',
-                    PAUSE_TEXT: '#ecf0f1',
-                    GAME_OVER_BG: 'rgba(0, 0, 0, 0.85)',
-                    GAME_OVER_TEXT: '#ecf0f1',
-                    BUTTON_BG: '#1abc9c',
-                    BUTTON_HOVER_BG: '#16a085'
+                    GAME_BACKGROUND: '#1e1e1e',
+                    SNAKE_HEAD: '#00ff7f',
+                    SNAKE_BODY: '#32cd32',
+                    FOOD: '#ff4500',
+                    BORDER: '#ffffff',
+                    PAUSE_OVERLAY: 'rgba(0, 0, 0, 0.7)',
+                    PAUSE_TEXT: '#ffffff',
+                    GAME_OVER_BG: 'rgba(0, 0, 0, 0.9)',
+                    GAME_OVER_TEXT: '#ffffff',
+                    BUTTON_BG: '#00ff7f',
+                    BUTTON_HOVER_BG: '#32cd32'
                 };
                 static INITIAL_SPEED = 150;
                 static SPEED_INCREMENT = 5;
@@ -700,10 +700,15 @@
                         ArrowUp: 'UP',
                         ArrowDown: 'DOWN',
                         ArrowLeft: 'LEFT',
-                        ArrowRight: 'RIGHT'
+                        ArrowRight: 'RIGHT',
+                        KeyW: 'UP',
+                        KeyS: 'DOWN',
+                        KeyA: 'LEFT',
+                        KeyD: 'RIGHT'
                     };
-                    if (keyMap[event.key]) {
-                        this.snake.enqueueDirection(keyMap[event.key]);
+                    if (keyMap[event.code] || keyMap[event.key]) {
+                        const direction = keyMap[event.code] || keyMap[event.key];
+                        this.snake.enqueueDirection(direction);
                     }
                     if (event.code === 'Space') {
                         this.togglePause();
