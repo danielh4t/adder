@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Pause Overlay</title>
+    <title>Snake Game - Level Progression</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -377,6 +377,7 @@
         <div class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
+            <div id="level" class="score">Level: 1</div>
         </div>
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
@@ -405,7 +406,7 @@
             </div>
             <div class="modal" id="instructionsModal">
                 <h2>How to Play</h2>
-                <p>Control the snake using arrow keys or on-screen buttons. Eat food to grow and increase your score. Avoid hitting the walls or yourself!</p>
+                <p>Control the snake using arrow keys or on-screen buttons. Eat food to grow and increase your score. Advance through levels by reaching score thresholds. Avoid hitting the walls or yourself!</p>
                 <button id="closeModalButton" aria-label="Close Instructions">Got It!</button>
             </div>
         </div>
@@ -418,6 +419,7 @@
                 gameOverSound: document.getElementById('gameOverSound'),
                 score: document.getElementById('score'),
                 highScore: document.getElementById('highScore'),
+                level: document.getElementById('level'),
                 gameOver: document.getElementById('gameOver'),
                 startScreen: document.getElementById('startScreen'),
                 restartButton: document.getElementById('restartButton'),
@@ -462,6 +464,8 @@
                 static BOX_DIVISOR = 30;
                 static FOOD_EFFECT_DURATION = 5;
                 static TICK_RATE = 60;
+                static SCORE_PER_LEVEL = 50;
+                static LEVEL_SPEED_INCREMENT = 10;
             }
 
             class Renderer {
@@ -650,6 +654,7 @@
 
                 reset() {
                     this.score = 0;
+                    this.level = 1;
                     this.speed = Constants.INITIAL_SPEED;
                     this.snake = new Snake(this.box, this.numCols);
                     this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols);
@@ -662,6 +667,7 @@
                     this.hideElements();
                     this.loadHighScore();
                     this.updateScore();
+                    this.updateLevel();
                     this.updateButtons();
                     this.setupAudio();
                 }
@@ -683,6 +689,10 @@
                 updateScore() {
                     Elements.score.textContent = `Score: ${this.score}`;
                     Elements.highScore.textContent = `High Score: ${this.highScore}`;
+                }
+
+                updateLevel() {
+                    Elements.level.textContent = `Level: ${this.level}`;
                 }
 
                 setupAudio() {
@@ -873,6 +883,7 @@
                         this.updateScore();
                         this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols);
                         this.increaseSpeed();
+                        this.checkLevelUp();
                         this.applyFoodEffect();
                         Elements.eatSound.play();
                     } else {
@@ -892,6 +903,14 @@
 
                 increaseSpeed() {
                     if (this.speed > Constants.MIN_SPEED) this.speed -= Constants.SPEED_INCREMENT;
+                }
+
+                checkLevelUp() {
+                    if (this.score >= this.level * Constants.SCORE_PER_LEVEL) {
+                        this.level += 1;
+                        this.updateLevel();
+                        this.speed = Math.max(this.speed - Constants.LEVEL_SPEED_INCREMENT, Constants.MIN_SPEED);
+                    }
                 }
 
                 applyFoodEffect() {
