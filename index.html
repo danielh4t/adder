@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Level Progression</title>
+    <title>Snake Game - Improved Code Structure</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -502,10 +502,6 @@
                     this.ctx.fill(path);
                     this.ctx.stroke(path);
                     this.ctx.restore();
-                }
-
-                render(ctx) {
-                    this.ctx.drawImage(ctx.canvas, 0, 0);
                 }
             }
 
