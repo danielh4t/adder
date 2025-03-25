@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Code Structure</title>
+    <title>Snake Game - Enhanced User Interface</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -366,6 +366,26 @@
             font-weight: bold;
             text-shadow: 2px 2px 4px #000;
         }
+
+        /* Enhanced UI Styles */
+        .start-screen h2, .game-over h2 {
+            color: #ff4500;
+            text-shadow: 2px 2px 5px #000;
+        }
+
+        .start-screen p {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #ccc;
+        }
+
+        button {
+            transition: all 0.3s ease;
+        }
+
+        button:focus {
+            outline: 2px solid #00ff7f;
+        }
     </style>
 </head>
 
@@ -385,7 +405,7 @@
                 <span>Paused</span>
             </div>
             <div class="game-over" id="gameOver">
-                Game Over!<br>
+                <h2>Game Over!</h2>
                 <button id="restartButton" aria-label="Restart Game">Restart</button>
             </div>
             <div class="start-screen" id="startScreen">
