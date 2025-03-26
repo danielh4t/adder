@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced User Interface</title>
+    <title>Snake Game - Enhanced Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -368,7 +368,8 @@
         }
 
         /* Enhanced UI Styles */
-        .start-screen h2, .game-over h2 {
+        .start-screen h2,
+        .game-over h2 {
             color: #ff4500;
             text-shadow: 2px 2px 5px #000;
         }
@@ -391,9 +392,15 @@
 
 <body>
     <div>
-        <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_8e48699e2f.mp3?filename=background-music-115572.mp3" loop preload="auto"></audio>
-        <audio id="eatSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_bc1a7e80e3.mp3?filename=eating-sound-179445.mp3" preload="auto"></audio>
-        <audio id="gameOverSound" src="https://cdn.pixabay.com/download/audio/2022/12/10/audio_d8a1d5d7e4.mp3?filename=game-over-sound-153943.mp3" preload="auto"></audio>
+        <audio id="bgm"
+            src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_8e48699e2f.mp3?filename=background-music-115572.mp3"
+            loop preload="auto"></audio>
+        <audio id="eatSound"
+            src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_bc1a7e80e3.mp3?filename=eating-sound-179445.mp3"
+            preload="auto"></audio>
+        <audio id="gameOverSound"
+            src="https://cdn.pixabay.com/download/audio/2022/12/10/audio_d8a1d5d7e4.mp3?filename=game-over-sound-153943.mp3"
+            preload="auto"></audio>
         <div class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
@@ -456,13 +463,13 @@
                 pauseOverlay: document.getElementById('pauseOverlay'),
             };
 
-            function debounce(func, wait) {
+            const debounce = (func, wait) => {
                 let timeout;
-                return function(...args) {
+                return function (...args) {
                     clearTimeout(timeout);
                     timeout = setTimeout(() => func.apply(this, args), wait);
-                }
-            }
+                };
+            };
 
             class Constants {
                 static COLORS = {
