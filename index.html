@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Maintainability</title>
+    <title>Snake Game - Enhanced Usability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -102,7 +102,8 @@
         }
 
         .game-over,
-        .start-screen {
+        .start-screen,
+        .level-up-modal {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -141,7 +142,8 @@
         }
 
         .game-over button,
-        .start-screen button {
+        .start-screen button,
+        .level-up-modal button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -155,14 +157,16 @@
         }
 
         .game-over button:hover,
-        .start-screen button:hover {
+        .start-screen button:hover,
+        .level-up-modal button:hover {
             background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
         .game-over button:active,
-        .start-screen button:active {
+        .start-screen button:active,
+        .level-up-modal button:active {
             background: var(--button-active-bg);
             transform: scale(0.95);
             color: var(--button-active-color);
@@ -249,13 +253,15 @@
             }
 
             .game-over,
-            .start-screen {
+            .start-screen,
+            .level-up-modal {
                 padding: 50px 80px;
                 font-size: 26px;
             }
 
             .game-over button,
-            .start-screen button {
+            .start-screen button,
+            .level-up-modal button {
                 font-size: 20px;
                 padding: 14px 30px;
             }
@@ -271,7 +277,8 @@
 
         /* Enhanced UI Animations */
         .game-over,
-        .start-screen {
+        .start-screen,
+        .level-up-modal {
             animation: fadeInScale var(--animation-duration) forwards;
         }
 
@@ -369,12 +376,14 @@
 
         /* Enhanced UI Styles */
         .start-screen h2,
-        .game-over h2 {
+        .game-over h2,
+        .level-up-modal h2 {
             color: #ff4500;
             text-shadow: 2px 2px 5px #000;
         }
 
-        .start-screen p {
+        .start-screen p,
+        .level-up-modal p {
             margin-bottom: 20px;
             font-size: 18px;
             color: #ccc;
@@ -420,6 +429,11 @@
                 <p>Use Arrow Keys, Swipe or On-screen Buttons to Control the Snake</p>
                 <button id="startButton" aria-label="Start Game">Start Game</button>
             </div>
+            <div class="level-up-modal" id="levelUpModal">
+                <h2>Level Up!</h2>
+                <p>You've reached Level <span id="currentLevel">2</span>!</p>
+                <button id="closeLevelUpButton" aria-label="Close Level Up">Continue</button>
+            </div>
             <div class="controls" id="controls">
                 <button class="control-button" data-direction="UP" aria-label="Move Up">↑</button>
                 <div class="controls-row">
@@ -461,6 +475,9 @@
                 instructionsModal: document.getElementById('instructionsModal'),
                 closeModalButton: document.getElementById('closeModalButton'),
                 pauseOverlay: document.getElementById('pauseOverlay'),
+                levelUpModal: document.getElementById('levelUpModal'),
+                closeLevelUpButton: document.getElementById('closeLevelUpButton'),
+                currentLevel: document.getElementById('currentLevel'),
             };
 
             const debounce = (func, wait) => {
@@ -728,8 +745,9 @@
                 hideElements() {
                     Elements.gameOver.style.display = 'none';
                     Elements.startScreen.style.display = 'none';
-                    Elements.instructionsModal.classList.add('active');
+                    Elements.instructionsModal.classList.remove('active');
                     Elements.pauseOverlay.classList.remove('active');
+                    Elements.levelUpModal.style.display = 'none';
                 }
 
                 bindEvents() {
@@ -739,6 +757,7 @@
                     Elements.restartButton.addEventListener('click', this.restart.bind(this));
                     Elements.startButton.addEventListener('click', this.start.bind(this));
                     Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
+                    Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
                     Elements.controlButtons.forEach(button => {
                         button.addEventListener('click', () => {
                             const direction = button.getAttribute('data-direction');
@@ -867,7 +886,7 @@
                 }
 
                 closeModal() {
-                    this.instructionsModal.classList.remove('active');
+                    Elements.instructionsModal.classList.remove('active');
                     if (!this.isPaused) {
                         this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
                     }
@@ -877,6 +896,17 @@
                     this.reset();
                     Elements.gameOver.style.display = 'none';
                     this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                }
+
+                showLevelUpModal() {
+                    Elements.currentLevel.textContent = this.level;
+                    Elements.levelUpModal.style.display = 'block';
+                    this.pause();
+                }
+
+                closeLevelUpModal() {
+                    Elements.levelUpModal.style.display = 'none';
+                    this.resume();
                 }
 
                 gameCycle(timestamp) {
@@ -933,6 +963,7 @@
                         this.level += 1;
                         this.updateLevel();
                         this.speed = Math.max(this.speed - Constants.LEVEL_SPEED_INCREMENT, Constants.MIN_SPEED);
+                        this.showLevelUpModal();
                     }
                 }
 
