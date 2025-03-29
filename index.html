@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Smooth Pause Overlay</title>
+    <title>Snake Game - Display Final Score on Game Over</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -424,6 +424,7 @@
             </div>
             <div class="game-over" id="gameOver">
                 <h2>Game Over!</h2>
+                <p>Your Score: <span id="finalScore">0</span></p>
                 <button id="restartButton" aria-label="Restart Game">Restart</button>
             </div>
             <div class="start-screen" id="startScreen">
@@ -464,6 +465,7 @@
                 highScore: document.getElementById('highScore'),
                 level: document.getElementById('level'),
                 gameOver: document.getElementById('gameOver'),
+                finalScore: document.getElementById('finalScore'),
                 startScreen: document.getElementById('startScreen'),
                 restartButton: document.getElementById('restartButton'),
                 startButton: document.getElementById('startButton'),
@@ -991,6 +993,7 @@
                     cancelAnimationFrame(this.gameLoop);
                     Elements.bgm.pause();
                     Elements.gameOverSound.play();
+                    Elements.finalScore.textContent = this.score;
                     Elements.gameOver.style.display = 'block';
                     this.saveHighScore();
                 }
