@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Display Final Score on Game Over</title>
+    <title>Snake Game - Restart with Enter Key on Game Over</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -756,6 +756,7 @@
 
                 bindEvents() {
                     document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                    document.addEventListener('keyup', this.handleKeyUp.bind(this));
                     Elements.gameContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), false);
                     Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
                     Elements.restartButton.addEventListener('click', this.restart.bind(this));
@@ -792,6 +793,12 @@
                     }
                     if (event.code === 'Space') {
                         this.togglePause();
+                    }
+                }
+
+                handleKeyUp(event) {
+                    if (event.key === 'Enter' && this.gameOver.style.display === 'block') {
+                        this.restart();
                     }
                 }
 
