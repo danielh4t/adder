@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Restart with Enter Key on Game Over</title>
+    <title>Snake Game - Enhanced Code Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -787,8 +787,8 @@
                         KeyA: 'LEFT',
                         KeyD: 'RIGHT'
                     };
-                    if (keyMap[event.code] || keyMap[event.key]) {
-                        const direction = keyMap[event.code] || keyMap[event.key];
+                    const direction = keyMap[event.code] || keyMap[event.key];
+                    if (direction) {
                         this.snake.enqueueDirection(direction);
                     }
                     if (event.code === 'Space') {
@@ -1003,6 +1003,10 @@
                     Elements.finalScore.textContent = this.score;
                     Elements.gameOver.style.display = 'block';
                     this.saveHighScore();
+                }
+
+                updateButtons() {
+                    Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
                 }
             }
 
