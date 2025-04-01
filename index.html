@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Code Maintainability</title>
+    <title>Snake Game - Theme Switch Feature</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -31,6 +31,29 @@
             --modal-background: rgba(255, 255, 255, 0.1);
             --modal-text: #ffffff;
             --pause-overlay-display: none;
+        }
+
+        body.light-mode {
+            --game-background: #f0f0f0;
+            --snake-head: #007f7f;
+            --snake-body: #32c0c0;
+            --food: #ff6347;
+            --border: #000000;
+            --pause-overlay: rgba(255, 255, 255, 0.7);
+            --pause-text: #000000;
+            --game-over-bg: rgba(255, 255, 255, 0.9);
+            --game-over-text: #000000;
+            --button-bg: #007f7f;
+            --button-hover-bg: #32c0c0;
+            --button-active-bg: rgba(0, 127, 127, 0.3);
+            --button-active-color: #ffffff;
+            --special-button-bg: #ff6347;
+            --special-button-hover-bg: rgba(255, 99, 71, 0.3);
+            --special-button-color: #ff6347;
+            --special-button-active-color: #ffffff;
+            --special-button-border: #cc3700;
+            --modal-background: rgba(255, 255, 255, 0.8);
+            --modal-text: #000000;
         }
 
         * {
@@ -143,7 +166,8 @@
 
         .game-over button,
         .start-screen button,
-        .level-up-modal button {
+        .level-up-modal button,
+        .theme-button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -158,7 +182,8 @@
 
         .game-over button:hover,
         .start-screen button:hover,
-        .level-up-modal button:hover {
+        .level-up-modal button:hover,
+        .theme-button:hover {
             background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
@@ -166,7 +191,8 @@
 
         .game-over button:active,
         .start-screen button:active,
-        .level-up-modal button:active {
+        .level-up-modal button:active,
+        .theme-button:active {
             background: var(--button-active-bg);
             transform: scale(0.95);
             color: var(--button-active-color);
@@ -221,7 +247,8 @@
 
         .control-button.pause-button,
         .control-button.fullscreen-button,
-        .control-button.sound-button {
+        .control-button.sound-button,
+        .control-button.theme-button {
             width: 70px;
             height: 70px;
             font-size: 24px;
@@ -233,14 +260,16 @@
 
         .control-button.pause-button:hover,
         .control-button.fullscreen-button:hover,
-        .control-button.sound-button:hover {
+        .control-button.sound-button:hover,
+        .control-button.theme-button:hover {
             background: var(--special-button-hover-bg);
             border-color: var(--special-button-border);
         }
 
         .control-button.pause-button:active,
         .control-button.fullscreen-button:active,
-        .control-button.sound-button:active {
+        .control-button.sound-button:active,
+        .control-button.theme-button:active {
             background: var(--special-button-hover-bg);
             color: var(--special-button-active-color);
         }
@@ -261,14 +290,16 @@
 
             .game-over button,
             .start-screen button,
-            .level-up-modal button {
+            .level-up-modal button,
+            .theme-button {
                 font-size: 20px;
                 padding: 14px 30px;
             }
 
             .control-button.pause-button,
             .control-button.fullscreen-button,
-            .control-button.sound-button {
+            .control-button.sound-button,
+            .control-button.theme-button {
                 width: 80px;
                 height: 80px;
                 font-size: 28px;
@@ -447,6 +478,7 @@
                 <button class="control-button pause-button" id="pauseButton" aria-label="Pause Game">⏸️</button>
                 <button class="control-button fullscreen-button" id="fullscreenButton" aria-label="Toggle Fullscreen">⛶</button>
                 <button class="control-button sound-button" id="soundButton" aria-label="Toggle Sound">🔊</button>
+                <button class="control-button theme-button" id="themeButton" aria-label="Toggle Theme">🌙</button>
             </div>
             <div class="modal" id="instructionsModal">
                 <h2>How to Play</h2>
@@ -473,6 +505,7 @@
                 pauseButton: document.getElementById('pauseButton'),
                 fullscreenButton: document.getElementById('fullscreenButton'),
                 soundButton: document.getElementById('soundButton'),
+                themeButton: document.getElementById('themeButton'),
                 gameContainer: document.getElementById('gameContainer'),
                 gameCanvas: document.getElementById('gameCanvas'),
                 controls: document.getElementById('controls'),
@@ -482,6 +515,7 @@
                 levelUpModal: document.getElementById('levelUpModal'),
                 closeLevelUpButton: document.getElementById('closeLevelUpButton'),
                 currentLevel: document.getElementById('currentLevel'),
+                themeButtonIcon: document.getElementById('themeButton')
             };
 
             const debounce = (func, wait) => {
@@ -675,6 +709,7 @@
                     this.initCanvas();
                     this.reset();
                     this.bindEvents();
+                    this.applySavedTheme();
                 }
 
                 initCanvas() {
@@ -772,6 +807,7 @@
                     Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
                     Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
+                    Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
                     window.addEventListener('resize', debounce(this.handleResize.bind(this), 200));
                     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                 }
@@ -887,6 +923,24 @@
                     Elements.eatSound.muted = this.isMuted;
                     Elements.gameOverSound.muted = this.isMuted;
                     Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
+                }
+
+                toggleTheme() {
+                    document.body.classList.toggle('light-mode');
+                    const isLight = document.body.classList.contains('light-mode');
+                    Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                }
+
+                applySavedTheme() {
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'light') {
+                        document.body.classList.add('light-mode');
+                        Elements.themeButton.textContent = '☀️';
+                    } else {
+                        document.body.classList.remove('light-mode');
+                        Elements.themeButton.textContent = '🌙';
+                    }
                 }
 
                 start() {
