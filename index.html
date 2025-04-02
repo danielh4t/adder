@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Theme Switch Feature</title>
+    <title>Snake Game - Improved Code Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -514,8 +514,7 @@
                 pauseOverlay: document.getElementById('pauseOverlay'),
                 levelUpModal: document.getElementById('levelUpModal'),
                 closeLevelUpButton: document.getElementById('closeLevelUpButton'),
-                currentLevel: document.getElementById('currentLevel'),
-                themeButtonIcon: document.getElementById('themeButton')
+                currentLevel: document.getElementById('currentLevel')
             };
 
             const debounce = (func, wait) => {
