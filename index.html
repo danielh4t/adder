@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Code Maintainability</title>
+    <title>Snake Game - Improved Touch Event Performance</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -791,8 +791,8 @@
                 bindEvents() {
                     document.addEventListener('keydown', this.handleKeyDown.bind(this));
                     document.addEventListener('keyup', this.handleKeyUp.bind(this));
-                    Elements.gameContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), false);
-                    Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), false);
+                    Elements.gameContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+                    Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
                     Elements.restartButton.addEventListener('click', this.restart.bind(this));
                     Elements.startButton.addEventListener('click', this.start.bind(this));
                     Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
