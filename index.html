@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Touch Event Performance</title>
+    <title>Snake Game - Optimized Control Event Handling</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -501,14 +501,13 @@
                 startScreen: document.getElementById('startScreen'),
                 restartButton: document.getElementById('restartButton'),
                 startButton: document.getElementById('startButton'),
-                controlButtons: document.querySelectorAll('.control-button[data-direction]'),
+                controls: document.getElementById('controls'),
                 pauseButton: document.getElementById('pauseButton'),
                 fullscreenButton: document.getElementById('fullscreenButton'),
                 soundButton: document.getElementById('soundButton'),
                 themeButton: document.getElementById('themeButton'),
                 gameContainer: document.getElementById('gameContainer'),
                 gameCanvas: document.getElementById('gameCanvas'),
-                controls: document.getElementById('controls'),
                 instructionsModal: document.getElementById('instructionsModal'),
                 closeModalButton: document.getElementById('closeModalButton'),
                 pauseOverlay: document.getElementById('pauseOverlay'),
@@ -797,11 +796,12 @@
                     Elements.startButton.addEventListener('click', this.start.bind(this));
                     Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
                     Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
-                    Elements.controlButtons.forEach(button => {
-                        button.addEventListener('click', () => {
+                    Elements.controls.addEventListener('click', (event) => {
+                        const button = event.target.closest('.control-button[data-direction]');
+                        if (button) {
                             const direction = button.getAttribute('data-direction');
-                            if (direction) this.snake.enqueueDirection(direction);
-                        });
+                            this.snake.enqueueDirection(direction);
+                        }
                     });
                     Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
