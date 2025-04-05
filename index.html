@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Persistent Sound Settings</title>
+    <title>Snake Game - Initial Countdown Timer</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -126,7 +126,8 @@
 
         .game-over,
         .start-screen,
-        .level-up-modal {
+        .level-up-modal,
+        .countdown-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -167,7 +168,8 @@
         .game-over button,
         .start-screen button,
         .level-up-modal button,
-        .theme-button {
+        .theme-button,
+        .countdown-overlay button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -183,7 +185,8 @@
         .game-over button:hover,
         .start-screen button:hover,
         .level-up-modal button:hover,
-        .theme-button:hover {
+        .theme-button:hover,
+        .countdown-overlay button:hover {
             background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
@@ -192,7 +195,8 @@
         .game-over button:active,
         .start-screen button:active,
         .level-up-modal button:active,
-        .theme-button:active {
+        .theme-button:active,
+        .countdown-overlay button:active {
             background: var(--button-active-bg);
             transform: scale(0.95);
             color: var(--button-active-color);
@@ -283,7 +287,8 @@
 
             .game-over,
             .start-screen,
-            .level-up-modal {
+            .level-up-modal,
+            .countdown-overlay {
                 padding: 50px 80px;
                 font-size: 26px;
             }
@@ -291,7 +296,8 @@
             .game-over button,
             .start-screen button,
             .level-up-modal button,
-            .theme-button {
+            .theme-button,
+            .countdown-overlay button {
                 font-size: 20px;
                 padding: 14px 30px;
             }
@@ -309,7 +315,8 @@
         /* Enhanced UI Animations */
         .game-over,
         .start-screen,
-        .level-up-modal {
+        .level-up-modal,
+        .countdown-overlay {
             animation: fadeInScale var(--animation-duration) forwards;
         }
 
@@ -429,6 +436,21 @@
         button:focus {
             outline: 2px solid #00ff7f;
         }
+
+        /* Countdown Overlay Styles */
+        .countdown-overlay {
+            z-index: 5;
+            font-size: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .countdown-overlay.active {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -467,6 +489,9 @@
                 <h2>Level Up!</h2>
                 <p>You've reached Level <span id="currentLevel">2</span>!</p>
                 <button id="closeLevelUpButton" aria-label="Close Level Up">Continue</button>
+            </div>
+            <div class="countdown-overlay" id="countdownOverlay">
+                <span id="countdownNumber">3</span>
             </div>
             <div class="controls" id="controls">
                 <button class="control-button" data-direction="UP" aria-label="Move Up">↑</button>
@@ -513,7 +538,9 @@
                 pauseOverlay: document.getElementById('pauseOverlay'),
                 levelUpModal: document.getElementById('levelUpModal'),
                 closeLevelUpButton: document.getElementById('closeLevelUpButton'),
-                currentLevel: document.getElementById('currentLevel')
+                currentLevel: document.getElementById('currentLevel'),
+                countdownOverlay: document.getElementById('countdownOverlay'),
+                countdownNumber: document.getElementById('countdownNumber')
             };
 
             const debounce = (func, wait) => {
@@ -546,6 +573,7 @@
                 static TICK_RATE = 60;
                 static SCORE_PER_LEVEL = 50;
                 static LEVEL_SPEED_INCREMENT = 10;
+                static COUNTDOWN_START = 3;
             }
 
             class Renderer {
@@ -792,6 +820,7 @@
                     Elements.instructionsModal.classList.remove('active');
                     Elements.pauseOverlay.classList.remove('active');
                     Elements.levelUpModal.style.display = 'none';
+                    Elements.countdownOverlay.classList.remove('active');
                 }
 
                 bindEvents() {
@@ -951,10 +980,27 @@
                 }
 
                 start() {
-                    this.reset();
                     Elements.startScreen.style.display = 'none';
-                    Elements.instructionsModal.classList.remove('active');
-                    this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    this.showCountdown(() => {
+                        this.reset();
+                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    });
+                }
+
+                showCountdown(callback) {
+                    let count = Constants.COUNTDOWN_START;
+                    Elements.countdownNumber.textContent = count;
+                    Elements.countdownOverlay.classList.add('active');
+                    const countdownInterval = setInterval(() => {
+                        count -= 1;
+                        if (count === 0) {
+                            clearInterval(countdownInterval);
+                            Elements.countdownOverlay.classList.remove('active');
+                            callback();
+                        } else {
+                            Elements.countdownNumber.textContent = count;
+                        }
+                    }, 1000);
                 }
 
                 closeModal() {
@@ -965,9 +1011,11 @@
                 }
 
                 restart() {
-                    this.reset();
                     Elements.gameOver.style.display = 'none';
-                    this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    this.showCountdown(() => {
+                        this.reset();
+                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    });
                 }
 
                 showLevelUpModal() {
