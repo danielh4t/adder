@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Optimized Control Event Handling</title>
+    <title>Snake Game - Persistent Sound Settings</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -745,8 +745,15 @@
                     this.loadHighScore();
                     this.updateScore();
                     this.updateLevel();
-                    this.updateButtons();
                     this.setupAudio();
+
+                    // Load persisted sound settings
+                    const savedMuted = localStorage.getItem('isMuted') === 'true';
+                    this.isMuted = savedMuted || false;
+                    Elements.bgm.muted = this.isMuted;
+                    Elements.eatSound.muted = this.isMuted;
+                    Elements.gameOverSound.muted = this.isMuted;
+                    this.updateButtons();
                 }
 
                 loadHighScore() {
@@ -922,6 +929,7 @@
                     Elements.eatSound.muted = this.isMuted;
                     Elements.gameOverSound.muted = this.isMuted;
                     Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
+                    localStorage.setItem('isMuted', this.isMuted);
                 }
 
                 toggleTheme() {
