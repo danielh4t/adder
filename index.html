@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced User Interface</title>
+    <title>Snake Game - Improved Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -51,7 +51,6 @@
             --special-button-hover-bg: rgba(255, 99, 71, 0.3);
             --special-button-color: #ff6347;
             --special-button-active-color: #ffffff;
-            --special-button-border: #cc3700;
             --modal-background: rgba(255, 255, 255, 0.8);
             --modal-text: #000000;
         }
@@ -165,11 +164,8 @@
             }
         }
 
-        .game-over button,
-        .start-screen button,
-        .level-up-modal button,
-        .theme-button,
-        .countdown-overlay button {
+        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button,
+        .theme-button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -182,21 +178,17 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .game-over button:hover,
-        .start-screen button:hover,
-        .level-up-modal button:hover,
-        .theme-button:hover,
-        .countdown-overlay button:hover {
+        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button:hover,
+        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) .theme-button:hover,
+        .control-button:hover {
             background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .game-over button:active,
-        .start-screen button:active,
-        .level-up-modal button:active,
-        .theme-button:active,
-        .countdown-overlay button:active {
+        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button:active,
+        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) .theme-button:active,
+        .control-button:active {
             background: var(--button-active-bg);
             transform: scale(0.95);
             color: var(--button-active-color);
@@ -293,11 +285,8 @@
                 font-size: 26px;
             }
 
-            .game-over button,
-            .start-screen button,
-            .level-up-modal button,
-            .theme-button,
-            .countdown-overlay button {
+            :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button,
+            .theme-button {
                 font-size: 20px;
                 padding: 14px 30px;
             }
