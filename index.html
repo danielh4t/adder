@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Maintainability</title>
+    <title>Snake Game - Enhanced Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -518,6 +518,17 @@
         </div>
     </div>
     <script>
+        const DIRECTION_MAP = {
+            ArrowUp: 'UP',
+            ArrowDown: 'DOWN',
+            ArrowLeft: 'LEFT',
+            ArrowRight: 'RIGHT',
+            KeyW: 'UP',
+            KeyS: 'DOWN',
+            KeyA: 'LEFT',
+            KeyD: 'RIGHT'
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const Elements = {
                 bgm: document.getElementById('bgm'),
@@ -857,17 +868,7 @@
                 }
 
                 handleKeyDown(event) {
-                    const keyMap = {
-                        ArrowUp: 'UP',
-                        ArrowDown: 'DOWN',
-                        ArrowLeft: 'LEFT',
-                        ArrowRight: 'RIGHT',
-                        KeyW: 'UP',
-                        KeyS: 'DOWN',
-                        KeyA: 'LEFT',
-                        KeyD: 'RIGHT'
-                    };
-                    const direction = keyMap[event.code] || keyMap[event.key];
+                    const direction = DIRECTION_MAP[event.code] || DIRECTION_MAP[event.key];
                     if (direction) {
                         this.snake.enqueueDirection(direction);
                     }
