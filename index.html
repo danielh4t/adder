@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Maintainability</title>
+    <title>Snake Game - Optimized Rendering Performance</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -50,7 +50,6 @@
             --special-button-bg: #ff6347;
             --special-button-hover-bg: rgba(255, 99, 71, 0.3);
             --special-button-color: #ff6347;
-            --special-button-active-color: #ffffff;
             --modal-background: rgba(255, 255, 255, 0.8);
             --modal-text: #000000;
         }
@@ -701,10 +700,13 @@
 
                 draw(ctx, cornerRadius, renderer) {
                     ctx.strokeStyle = Constants.COLORS.BORDER;
-                    this.segments.forEach((segment, index) => {
-                        ctx.fillStyle = index === 0 ? Constants.COLORS.SNAKE_HEAD : Constants.COLORS.SNAKE_BODY;
+                    ctx.fillStyle = Constants.COLORS.SNAKE_HEAD;
+                    renderer.drawRoundedRect(this.segments[0].x, this.segments[0].y, this.box, this.box, cornerRadius);
+                    ctx.fillStyle = Constants.COLORS.SNAKE_BODY;
+                    for (let i = 1; i < this.segments.length; i++) {
+                        const segment = this.segments[i];
                         renderer.drawRoundedRect(segment.x, segment.y, this.box, this.box, cornerRadius);
-                    });
+                    }
                 }
             }
 
@@ -864,6 +866,7 @@
                     // Open instructions modal on start
                     Elements.startButton.addEventListener('click', () => {
                         Elements.instructionsModal.classList.add('active');
+                        this.pause();
                     });
                 }
 
