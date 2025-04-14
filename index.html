@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Code Maintainability</title>
+    <title>Snake Game - Enhanced Semantic Structure</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -72,7 +72,7 @@
             transition: background 0.5s ease;
         }
 
-        .game-container {
+        main {
             position: relative;
             width: 90vw;
             height: 90vw;
@@ -455,7 +455,7 @@
 </head>
 
 <body>
-    <div>
+    <main>
         <audio id="bgm"
             src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_8e48699e2f.mp3?filename=background-music-115572.mp3"
             loop preload="auto"></audio>
@@ -465,11 +465,11 @@
         <audio id="gameOverSound"
             src="https://cdn.pixabay.com/download/audio/2022/12/10/audio_d8a1d5d7e4.mp3?filename=game-over-sound-153943.mp3"
             preload="auto"></audio>
-        <div class="score-container">
+        <section class="score-container">
             <div id="score" class="score">Score: 0</div>
             <div id="highScore" class="score">High Score: 0</div>
             <div id="level" class="score">Level: 1</div>
-        </div>
+        </section>
         <div class="game-container" id="gameContainer">
             <canvas id="gameCanvas"></canvas>
             <div class="pause-overlay" id="pauseOverlay">
@@ -511,7 +511,7 @@
                 <button id="closeModalButton" aria-label="Close Instructions">Got It!</button>
             </div>
         </div>
-    </div>
+    </main>
     <script>
         'use strict';
         const DIRECTION_MAP = {
