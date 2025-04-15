@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Semantic Structure</title>
+    <title>Snake Game - Enhanced User Interface</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -451,6 +451,54 @@
                 opacity: 1;
             }
         }
+
+        /* Responsive Controls */
+        @media (max-width: 599px) {
+            .controls {
+                flex-direction: row;
+                justify-content: space-around;
+                bottom: 10px;
+            }
+
+            .controls-row {
+                margin: 0;
+            }
+
+            .control-button {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                margin: 4px;
+            }
+
+            .control-button.pause-button,
+            .control-button.fullscreen-button,
+            .control-button.sound-button,
+            .control-button.theme-button {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+
+            .modal {
+                top: 10%;
+                padding: 15px 30px;
+            }
+
+            .modal h2 {
+                font-size: 24px;
+            }
+
+            .modal p {
+                font-size: 16px;
+            }
+
+            .modal button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
     </style>
 </head>
 
@@ -858,7 +906,7 @@
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
                     Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
                     Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
-                    window.addEventListener('resize', debounce(this.handleResize.bind(this), 200));
+                    window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                     // Open instructions modal on start
                     Elements.startButton.addEventListener('click', () => {
