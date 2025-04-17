@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Code Structure</title>
+    <title>Snake Game - Optimized Rendering</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -640,36 +640,15 @@
                 constructor(canvas) {
                     this.canvas = canvas;
                     this.ctx = this.canvas.getContext('2d');
-                    Renderer.roundedRectCache = new Map();
                 }
 
                 clear(width, height) {
                     this.ctx.clearRect(0, 0, width, height);
                 }
 
-                drawRoundedRect(x, y, width, height, radius) {
-                    const key = `${width},${height},${radius}`;
-                    let path = Renderer.roundedRectCache.get(key);
-                    if (!path) {
-                        path = new Path2D();
-                        const r = Math.min(radius, Math.min(width / 2, height / 2));
-                        path.moveTo(r, 0);
-                        path.lineTo(width - r, 0);
-                        path.quadraticCurveTo(width, 0, width, r);
-                        path.lineTo(width, height - r);
-                        path.quadraticCurveTo(width, height, width - r, height);
-                        path.lineTo(r, height);
-                        path.quadraticCurveTo(0, height, 0, height - r);
-                        path.lineTo(0, r);
-                        path.quadraticCurveTo(0, 0, r, 0);
-                        path.closePath();
-                        Renderer.roundedRectCache.set(key, path);
-                    }
-                    this.ctx.save();
-                    this.ctx.translate(x, y);
-                    this.ctx.fill(path);
-                    this.ctx.stroke(path);
-                    this.ctx.restore();
+                drawRect(x, y, width, height) {
+                    this.ctx.fillRect(x, y, width, height);
+                    this.ctx.strokeRect(x, y, width, height);
                 }
             }
 
@@ -743,14 +722,14 @@
                     return this.positions.size !== this.segments.length;
                 }
 
-                draw(ctx, cornerRadius, renderer) {
+                draw(ctx, renderer) {
                     ctx.strokeStyle = Constants.COLORS.BORDER;
                     ctx.fillStyle = Constants.COLORS.SNAKE_HEAD;
-                    renderer.drawRoundedRect(this.segments[0].x, this.segments[0].y, this.box, this.box, cornerRadius);
+                    renderer.drawRect(this.segments[0].x, this.segments[0].y, this.box, this.box);
                     ctx.fillStyle = Constants.COLORS.SNAKE_BODY;
                     for (let i = 1; i < this.segments.length; i++) {
                         const segment = this.segments[i];
-                        renderer.drawRoundedRect(segment.x, segment.y, this.box, this.box, cornerRadius);
+                        renderer.drawRect(segment.x, segment.y, this.box, this.box);
                     }
                 }
             }
@@ -1153,7 +1132,7 @@
                 render() {
                     this.renderer.clear(this.scaledWidth, this.scaledHeight);
                     this.food.draw(this.ctx, this.foodEffect, this.foodEffectTimer, Constants.FOOD_EFFECT_DURATION, this.box);
-                    this.snake.draw(this.ctx, 5, this.renderer);
+                    this.snake.draw(this.ctx, this.renderer);
                     if (this.foodEffect && this.foodEffectTimer > 0) {
                         this.foodEffectTimer--;
                         if (this.foodEffectTimer === 0) {
