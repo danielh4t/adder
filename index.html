@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Maintainability</title>
+    <title>Snake Game - Enhanced CSS Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -125,7 +125,8 @@
         .game-over,
         .start-screen,
         .level-up-modal,
-        .countdown-overlay {
+        .countdown-overlay,
+        .modal {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -163,7 +164,11 @@
             }
         }
 
-        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button,
+        .game-over button,
+        .start-screen button,
+        .level-up-modal button,
+        .countdown-overlay button,
+        .modal button,
         .theme-button {
             margin-top: 20px;
             padding: 12px 25px;
@@ -177,17 +182,13 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button:hover,
-        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) .theme-button:hover,
-        .control-button:hover {
+        button:hover {
             background: var(--button-hover-bg);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
-        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button:active,
-        :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) .theme-button:active,
-        .control-button:active {
+        button:active {
             background: var(--button-active-bg);
             transform: scale(0.95);
             color: var(--button-active-color);
@@ -284,7 +285,11 @@
                 font-size: 26px;
             }
 
-            :is(.game-over, .start-screen, .level-up-modal, .countdown-overlay) button,
+            .game-over button,
+            .start-screen button,
+            .level-up-modal button,
+            .countdown-overlay button,
+            .modal button,
             .theme-button {
                 font-size: 20px;
                 padding: 14px 30px;
@@ -319,7 +324,6 @@
 
         /* Modal Styles */
         .modal {
-            position: absolute;
             top: 20%;
             left: 50%;
             transform: translate(-50%, 0);
@@ -346,27 +350,6 @@
         .modal p {
             margin-bottom: 20px;
             font-size: 18px;
-        }
-
-        .modal button {
-            padding: 10px 20px;
-            background: var(--button-bg);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background var(--transition-duration) ease, transform 0.2s ease;
-        }
-
-        .modal button:hover {
-            background: var(--button-hover-bg);
-            transform: translateY(-2px);
-        }
-
-        .modal button:active {
-            background: var(--button-active-bg);
-            transform: scale(0.95);
         }
 
         /* Pause Overlay Styles */
