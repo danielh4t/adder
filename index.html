@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced CSS Maintainability</title>
+    <title>Snake Game - Improved Code Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -545,16 +545,32 @@
     </main>
     <script>
         'use strict';
-        const DIRECTION_MAP = {
-            ArrowUp: 'UP',
-            ArrowDown: 'DOWN',
-            ArrowLeft: 'LEFT',
-            ArrowRight: 'RIGHT',
-            KeyW: 'UP',
-            KeyS: 'DOWN',
-            KeyA: 'LEFT',
-            KeyD: 'RIGHT'
-        };
+        const COLORS = (() => {
+            const styles = getComputedStyle(document.documentElement);
+            return {
+                GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
+                SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
+                SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
+                FOOD: styles.getPropertyValue('--food').trim(),
+                BORDER: styles.getPropertyValue('--border').trim(),
+                PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
+                PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
+                GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
+                GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
+                BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
+                BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim()
+            };
+        })();
+
+        const INITIAL_SPEED = 150;
+        const SPEED_INCREMENT = 5;
+        const MIN_SPEED = 50;
+        const BOX_DIVISOR = 30;
+        const FOOD_EFFECT_DURATION = 5;
+        const TICK_RATE = 60;
+        const SCORE_PER_LEVEL = 50;
+        const LEVEL_SPEED_INCREMENT = 10;
+        const COUNTDOWN_START = 3;
 
         document.addEventListener('DOMContentLoaded', () => {
             const Elements = {
@@ -593,35 +609,6 @@
                     timeout = setTimeout(() => func.apply(this, args), wait);
                 };
             };
-
-            class Constants {
-                static getColors() {
-                    const styles = getComputedStyle(document.documentElement);
-                    return {
-                        GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
-                        SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
-                        SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
-                        FOOD: styles.getPropertyValue('--food').trim(),
-                        BORDER: styles.getPropertyValue('--border').trim(),
-                        PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
-                        PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
-                        GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
-                        GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
-                        BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
-                        BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim()
-                    };
-                }
-
-                static INITIAL_SPEED = 150;
-                static SPEED_INCREMENT = 5;
-                static MIN_SPEED = 50;
-                static BOX_DIVISOR = 30;
-                static FOOD_EFFECT_DURATION = 5;
-                static TICK_RATE = 60;
-                static SCORE_PER_LEVEL = 50;
-                static LEVEL_SPEED_INCREMENT = 10;
-                static COUNTDOWN_START = 3;
-            }
 
             class Renderer {
                 constructor(canvas, colors) {
@@ -761,7 +748,7 @@
 
             class Game {
                 constructor() {
-                    this.colors = Constants.getColors();
+                    this.colors = COLORS;
                     this.renderer = new Renderer(Elements.gameCanvas, this.colors);
                     this.initCanvas();
                     this.reset();
@@ -791,7 +778,7 @@
                 reset() {
                     this.score = 0;
                     this.level = 1;
-                    this.speed = Constants.INITIAL_SPEED;
+                    this.speed = INITIAL_SPEED;
                     this.snake = new Snake(this.box, this.numCols, this.colors);
                     this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
                     this.isPaused = false;
@@ -991,7 +978,7 @@
                     Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
                     localStorage.setItem('theme', isLight ? 'light' : 'dark');
                     // Update colors after theme toggle
-                    this.colors = Constants.getColors();
+                    this.colors = COLORS;
                     this.renderer.colors = this.colors;
                     this.snake.colors = this.colors;
                     this.food.colors = this.colors;
@@ -1007,7 +994,7 @@
                         Elements.themeButton.textContent = '🌙';
                     }
                     // Update colors based on theme
-                    this.colors = Constants.getColors();
+                    this.colors = COLORS;
                     if (this.renderer) {
                         this.renderer.colors = this.colors;
                     }
@@ -1022,7 +1009,7 @@
                 }
 
                 showCountdown(callback) {
-                    let count = Constants.COUNTDOWN_START;
+                    let count = COUNTDOWN_START;
                     Elements.countdownNumber.textContent = count;
                     Elements.countdownOverlay.classList.add('active');
                     const countdownInterval = setInterval(() => {
@@ -1108,14 +1095,14 @@
                 }
 
                 increaseSpeed() {
-                    if (this.speed > Constants.MIN_SPEED) this.speed -= Constants.SPEED_INCREMENT;
+                    if (this.speed > MIN_SPEED) this.speed -= SPEED_INCREMENT;
                 }
 
                 checkLevelUp() {
-                    if (this.score >= this.level * Constants.SCORE_PER_LEVEL) {
+                    if (this.score >= this.level * SCORE_PER_LEVEL) {
                         this.level += 1;
                         this.updateLevel();
-                        this.speed = Math.max(this.speed - Constants.LEVEL_SPEED_INCREMENT, Constants.MIN_SPEED);
+                        this.speed = Math.max(this.speed - LEVEL_SPEED_INCREMENT, MIN_SPEED);
                         this.showLevelUpModal();
                     }
                 }
@@ -1140,6 +1127,17 @@
                     Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
                 }
             }
+
+            const DIRECTION_MAP = {
+                ArrowUp: 'UP',
+                ArrowDown: 'DOWN',
+                ArrowLeft: 'LEFT',
+                ArrowRight: 'RIGHT',
+                KeyW: 'UP',
+                KeyS: 'DOWN',
+                KeyA: 'LEFT',
+                KeyD: 'RIGHT'
+            };
 
             const game = new Game();
             game.reset();
