@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Improved Code Maintainability</title>
+    <title>Snake Game - Enhanced Code Modularity</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -602,6 +602,17 @@
                 countdownNumber: document.getElementById('countdownNumber')
             };
 
+            const DIRECTION_MAP = {
+                ArrowUp: 'UP',
+                ArrowDown: 'DOWN',
+                ArrowLeft: 'LEFT',
+                ArrowRight: 'RIGHT',
+                KeyW: 'UP',
+                KeyS: 'DOWN',
+                KeyA: 'LEFT',
+                KeyD: 'RIGHT'
+            };
+
             const debounce = (func, wait) => {
                 let timeout;
                 return function (...args) {
@@ -705,7 +716,7 @@
                     return this.positions.size !== this.segments.length;
                 }
 
-                draw(ctx, renderer) {
+                draw(renderer) {
                     // Draw head
                     renderer.drawRect(this.segments[0].x, this.segments[0].y, this.box, this.box, this.colors.SNAKE_HEAD);
                     // Draw body
@@ -741,7 +752,7 @@
                     return this.snakeSegments.some(segment => (segment.x / this.box) + (segment.y / this.box) * this.numCols === index);
                 }
 
-                draw(ctx, renderer) {
+                draw(renderer) {
                     renderer.drawCircle(this.position.x + this.box / 2, this.position.y + this.box / 2, this.box / 2.5, this.colors.FOOD);
                 }
             }
@@ -848,13 +859,7 @@
                     Elements.startButton.addEventListener('click', this.start.bind(this));
                     Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
                     Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
-                    Elements.controls.addEventListener('click', (event) => {
-                        const button = event.target.closest('.control-button[data-direction]');
-                        if (button) {
-                            const direction = button.getAttribute('data-direction');
-                            this.snake.enqueueDirection(direction);
-                        }
-                    });
+                    Elements.controls.addEventListener('click', this.handleControlClick.bind(this));
                     Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
                     Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
@@ -923,6 +928,14 @@
                 handleVisibilityChange() {
                     if (document.hidden && !this.isPaused) {
                         this.pause();
+                    }
+                }
+
+                handleControlClick(event) {
+                    const button = event.target.closest('.control-button[data-direction]');
+                    if (button) {
+                        const direction = button.getAttribute('data-direction');
+                        this.snake.enqueueDirection(direction);
                     }
                 }
 
@@ -1109,8 +1122,8 @@
 
                 render() {
                     this.renderer.clear(this.scaledWidth, this.scaledHeight);
-                    this.food.draw(this.ctx, this.renderer);
-                    this.snake.draw(this.ctx, this.renderer);
+                    this.food.draw(this.renderer);
+                    this.snake.draw(this.renderer);
                 }
 
                 endGame() {
@@ -1127,17 +1140,6 @@
                     Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
                 }
             }
-
-            const DIRECTION_MAP = {
-                ArrowUp: 'UP',
-                ArrowDown: 'DOWN',
-                ArrowLeft: 'LEFT',
-                ArrowRight: 'RIGHT',
-                KeyW: 'UP',
-                KeyS: 'DOWN',
-                KeyA: 'LEFT',
-                KeyD: 'RIGHT'
-            };
 
             const game = new Game();
             game.reset();
