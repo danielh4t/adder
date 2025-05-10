@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Leaderboard Added</title>
+    <title>Snake Game - Code Refactored for Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -560,22 +560,6 @@
     </main>
     <script>
         'use strict';
-        const COLORS = (() => {
-            const styles = getComputedStyle(document.documentElement);
-            return {
-                GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
-                SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
-                SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
-                FOOD: styles.getPropertyValue('--food').trim(),
-                BORDER: styles.getPropertyValue('--border').trim(),
-                PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
-                PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
-                GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
-                GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
-                BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
-                BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim()
-            };
-        })();
 
         const INITIAL_SPEED = 150;
         const SPEED_INCREMENT = 5;
@@ -775,12 +759,29 @@
 
             class Game {
                 constructor() {
-                    this.colors = COLORS;
+                    this.colors = this.getColors();
                     this.renderer = new Renderer(Elements.gameCanvas, this.colors);
                     this.initCanvas();
                     this.reset();
                     this.bindEvents();
                     this.applySavedTheme();
+                }
+
+                getColors() {
+                    const styles = getComputedStyle(document.documentElement);
+                    return {
+                        GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
+                        SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
+                        SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
+                        FOOD: styles.getPropertyValue('--food').trim(),
+                        BORDER: styles.getPropertyValue('--border').trim(),
+                        PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
+                        PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
+                        GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
+                        GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
+                        BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
+                        BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim()
+                    };
                 }
 
                 initCanvas() {
@@ -1027,7 +1028,7 @@
                     Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
                     localStorage.setItem('theme', isLight ? 'light' : 'dark');
                     // Update colors after theme toggle
-                    this.colors = COLORS;
+                    this.colors = this.getColors();
                     this.renderer.colors = this.colors;
                     this.snake.colors = this.colors;
                     this.food.colors = this.colors;
@@ -1043,7 +1044,7 @@
                         Elements.themeButton.textContent = '🌙';
                     }
                     // Update colors based on theme
-                    this.colors = COLORS;
+                    this.colors = this.getColors();
                     if (this.renderer) {
                         this.renderer.colors = this.colors;
                     }
