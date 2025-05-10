@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Enhanced Code Modularity</title>
+    <title>Snake Game - Leaderboard Added</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -105,6 +105,16 @@
 
         .score {
             margin-bottom: 5px;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .score ol {
+            list-style: decimal inside;
+            padding-left: 0;
+            margin: 5px 0 0 0;
+        }
+
+        .score li {
             text-shadow: 1px 1px 2px #000;
         }
 
@@ -498,7 +508,12 @@
             preload="auto"></audio>
         <section class="score-container">
             <div id="score" class="score">Score: 0</div>
-            <div id="highScore" class="score">High Score: 0</div>
+            <div id="highScore" class="score">
+                High Scores:
+                <ol id="highScoreList">
+                    <li>0</li>
+                </ol>
+            </div>
             <div id="level" class="score">Level: 1</div>
         </section>
         <div class="game-container" id="gameContainer">
@@ -579,6 +594,7 @@
                 gameOverSound: document.getElementById('gameOverSound'),
                 score: document.getElementById('score'),
                 highScore: document.getElementById('highScore'),
+                highScoreList: document.getElementById('highScoreList'),
                 level: document.getElementById('level'),
                 gameOver: document.getElementById('gameOver'),
                 finalScore: document.getElementById('finalScore'),
@@ -797,7 +813,7 @@
                     this.lastFrameTime = 0;
                     this.accumulatedTime = 0;
                     this.hideElements();
-                    this.loadHighScore();
+                    this.loadHighScores();
                     this.updateScore();
                     this.updateLevel();
                     this.setupAudio();
@@ -811,23 +827,43 @@
                     this.updateButtons();
                 }
 
-                loadHighScore() {
-                    this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
+                loadHighScores() {
+                    this.highScores = JSON.parse(localStorage.getItem('highScores')) || [0];
+                    this.updateHighScoreDisplay();
+                }
+
+                saveHighScores() {
+                    localStorage.setItem('highScores', JSON.stringify(this.highScores));
+                }
+
+                updateHighScoreDisplay() {
+                    Elements.highScoreList.innerHTML = '';
+                    this.highScores.forEach((score, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = score;
+                        Elements.highScoreList.appendChild(li);
+                    });
                 }
 
                 saveHighScore() {
-                    if (this.score > this.highScore) {
-                        this.highScore = this.score;
-                        localStorage.setItem('highScore', this.highScore);
-                        Elements.highScore.textContent = `High Score: ${this.highScore}`;
-                        Elements.highScore.classList.add('new-high-score');
-                        setTimeout(() => Elements.highScore.classList.remove('new-high-score'), 1000);
+                    if (this.highScores.length < 5 || this.score > this.highScores[this.highScores.length - 1]) {
+                        this.highScores.push(this.score);
+                        this.highScores.sort((a, b) => b - a);
+                        if (this.highScores.length > 5) {
+                            this.highScores.pop();
+                        }
+                        this.saveHighScores();
+                        this.updateHighScoreDisplay();
+                        if (this.highScores[0] === this.score) {
+                            Elements.highScoreList.children[0].classList.add('new-high-score');
+                            setTimeout(() => Elements.highScoreList.children[0].classList.remove('new-high-score'), 1000);
+                        }
                     }
                 }
 
                 updateScore() {
                     Elements.score.textContent = `Score: ${this.score}`;
-                    Elements.highScore.textContent = `High Score: ${this.highScore}`;
+                    this.updateHighScoreDisplay();
                 }
 
                 updateLevel() {
