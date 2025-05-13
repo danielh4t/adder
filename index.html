@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Code Refactored for Maintainability</title>
+    <title>Snake Game - Enhanced Audio Handling for Better Usability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -873,9 +873,7 @@
 
                 setupAudio() {
                     Elements.bgm.volume = 0.5;
-                    Elements.bgm.play().catch(() => {
-                        // User interaction required to play audio
-                    });
+                    // Removed initial play to handle audio after user interaction
                 }
 
                 hideElements() {
@@ -1052,10 +1050,8 @@
 
                 start() {
                     Elements.startScreen.style.display = 'none';
-                    this.showCountdown(() => {
-                        this.reset();
-                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                    });
+                    Elements.instructionsModal.classList.add('active');
+                    this.pause();
                 }
 
                 showCountdown(callback) {
@@ -1076,16 +1072,26 @@
 
                 closeModal() {
                     Elements.instructionsModal.classList.remove('active');
-                    if (!this.isPaused) {
+                    this.showCountdown(() => {
+                        this.reset();
+                        this.playBackgroundMusic();
                         this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                    }
+                    });
                 }
 
                 restart() {
                     Elements.gameOver.style.display = 'none';
                     this.showCountdown(() => {
                         this.reset();
+                        this.playBackgroundMusic();
                         this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    });
+                }
+
+                playBackgroundMusic() {
+                    Elements.bgm.play().catch(() => {
+                        // User interaction required to play audio
+                        // Audio will be played when user interacts next
                     });
                 }
 
