@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game - Code Cleanup for Better Maintainability</title>
+    <title>Snake Game – Refactored for Enhanced Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -30,6 +30,10 @@
             --animation-duration: 0.5s;
             --modal-background: rgba(255, 255, 255, 0.1);
             --modal-text: #ffffff;
+            --overlay-bg: rgba(0, 0, 0, 0.9);
+            --overlay-text: #ffffff;
+            --light-overlay-bg: rgba(255, 255, 255, 0.9);
+            --light-overlay-text: #000000;
         }
 
         body.light-mode {
@@ -51,6 +55,8 @@
             --special-button-color: #ff6347;
             --modal-background: rgba(255, 255, 255, 0.8);
             --modal-text: #000000;
+            --overlay-bg: rgba(255, 255, 255, 0.9);
+            --overlay-text: #000000;
         }
 
         * {
@@ -131,24 +137,27 @@
             }
         }
 
+        .overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 24px;
+            display: none;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+            animation: fadeInScale 0.5s forwards;
+        }
+
         .game-over,
         .start-screen,
         .level-up-modal,
         .countdown-overlay,
         .modal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: var(--game-over-bg);
-            padding: 40px 60px;
-            border-radius: 20px;
-            text-align: center;
-            font-size: 24px;
-            color: var(--game-over-text);
-            display: none;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
-            animation: fadeInScale 0.5s forwards;
+            background: var(--overlay-bg);
+            color: var(--overlay-text);
         }
 
         @keyframes fadeIn {
@@ -371,6 +380,7 @@
             background: var(--pause-overlay);
             opacity: 0;
             visibility: hidden;
+            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 4;
@@ -520,22 +530,22 @@
             <div class="pause-overlay" id="pauseOverlay">
                 <span>Paused</span>
             </div>
-            <div class="game-over" id="gameOver">
+            <div class="overlay game-over" id="gameOver">
                 <h2>Game Over!</h2>
                 <p>Your Score: <span id="finalScore">0</span></p>
                 <button id="restartButton" aria-label="Restart Game">Restart</button>
             </div>
-            <div class="start-screen" id="startScreen">
+            <div class="overlay start-screen" id="startScreen">
                 <h2>Welcome to Snake Game</h2>
                 <p>Use Arrow Keys, Swipe or On-screen Buttons to Control the Snake</p>
                 <button id="startButton" aria-label="Start Game">Start Game</button>
             </div>
-            <div class="level-up-modal" id="levelUpModal">
+            <div class="overlay level-up-modal" id="levelUpModal">
                 <h2>Level Up!</h2>
                 <p>You've reached Level <span id="currentLevel">2</span>!</p>
                 <button id="closeLevelUpButton" aria-label="Close Level Up">Continue</button>
             </div>
-            <div class="countdown-overlay" id="countdownOverlay">
+            <div class="overlay countdown-overlay" id="countdownOverlay">
                 <span id="countdownNumber">3</span>
             </div>
             <div class="controls" id="controls">
@@ -550,7 +560,7 @@
                 <button class="control-button sound-button" id="soundButton" aria-label="Toggle Sound">🔊</button>
                 <button class="control-button theme-button" id="themeButton" aria-label="Toggle Theme">🌙</button>
             </div>
-            <div class="modal" id="instructionsModal">
+            <div class="overlay modal" id="instructionsModal">
                 <h2>How to Play</h2>
                 <p>Control the snake using arrow keys or on-screen buttons. Eat food to grow and increase your score. Advance through levels by reaching score thresholds. Avoid hitting the walls or yourself!</p>
                 <button id="closeModalButton" aria-label="Close Instructions">Got It!</button>
@@ -779,7 +789,11 @@
                         GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
                         GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
                         BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
-                        BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim()
+                        BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim(),
+                        OVERLAY_BG: styles.getPropertyValue('--overlay-bg').trim(),
+                        OVERLAY_TEXT: styles.getPropertyValue('--overlay-text').trim(),
+                        LIGHT_OVERLAY_BG: styles.getPropertyValue('--light-overlay-bg').trim(),
+                        LIGHT_OVERLAY_TEXT: styles.getPropertyValue('--light-overlay-text').trim()
                     };
                 }
 
