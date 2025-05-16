@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game – Refactored for Enhanced Maintainability</title>
+    <title>Snake Game – Added High Score Reset Feature for Better Usability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -522,6 +522,10 @@
                 <ol id="highScoreList">
                     <li>0</li>
                 </ol>
+                <button id="clearHighScoresButton" aria-label="Clear High Scores"
+                    style="margin-top: 10px; padding: 6px 12px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; background: #ff6347; color: #fff;">
+                    Clear High Scores
+                </button>
             </div>
             <div id="level" class="score">Level: 1</div>
         </section>
@@ -608,7 +612,8 @@
                 closeLevelUpButton: document.getElementById('closeLevelUpButton'),
                 currentLevel: document.getElementById('currentLevel'),
                 countdownOverlay: document.getElementById('countdownOverlay'),
-                countdownNumber: document.getElementById('countdownNumber')
+                countdownNumber: document.getElementById('countdownNumber'),
+                clearHighScoresButton: document.getElementById('clearHighScoresButton')
             };
 
             const DIRECTION_MAP = {
@@ -912,6 +917,7 @@
                     Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
                     Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
                     Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
+                    Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                     window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                     // Open instructions modal on start
@@ -1194,6 +1200,14 @@
 
                 updateButtons() {
                     Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
+                }
+
+                clearHighScores() {
+                    if (confirm('Are you sure you want to clear all high scores?')) {
+                        this.highScores = [0];
+                        this.saveHighScores();
+                        this.updateHighScoreDisplay();
+                    }
                 }
             }
 
