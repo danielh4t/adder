@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game – Added High Score Reset Feature for Better Usability</title>
+    <title>Snake Game – Improved Code Structure for Better Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -572,649 +572,651 @@
         </div>
     </main>
     <script>
-        'use strict';
+        (function() {
+            'use strict';
 
-        const INITIAL_SPEED = 150;
-        const SPEED_INCREMENT = 5;
-        const MIN_SPEED = 50;
-        const BOX_DIVISOR = 30;
-        const FOOD_EFFECT_DURATION = 5;
-        const TICK_RATE = 60;
-        const SCORE_PER_LEVEL = 50;
-        const LEVEL_SPEED_INCREMENT = 10;
-        const COUNTDOWN_START = 3;
+            const INITIAL_SPEED = 150;
+            const SPEED_INCREMENT = 5;
+            const MIN_SPEED = 50;
+            const BOX_DIVISOR = 30;
+            const FOOD_EFFECT_DURATION = 5;
+            const TICK_RATE = 60;
+            const SCORE_PER_LEVEL = 50;
+            const LEVEL_SPEED_INCREMENT = 10;
+            const COUNTDOWN_START = 3;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const Elements = {
-                bgm: document.getElementById('bgm'),
-                eatSound: document.getElementById('eatSound'),
-                gameOverSound: document.getElementById('gameOverSound'),
-                score: document.getElementById('score'),
-                highScore: document.getElementById('highScore'),
-                highScoreList: document.getElementById('highScoreList'),
-                level: document.getElementById('level'),
-                gameOver: document.getElementById('gameOver'),
-                finalScore: document.getElementById('finalScore'),
-                startScreen: document.getElementById('startScreen'),
-                restartButton: document.getElementById('restartButton'),
-                startButton: document.getElementById('startButton'),
-                controls: document.getElementById('controls'),
-                pauseButton: document.getElementById('pauseButton'),
-                fullscreenButton: document.getElementById('fullscreenButton'),
-                soundButton: document.getElementById('soundButton'),
-                themeButton: document.getElementById('themeButton'),
-                gameContainer: document.getElementById('gameContainer'),
-                gameCanvas: document.getElementById('gameCanvas'),
-                instructionsModal: document.getElementById('instructionsModal'),
-                closeModalButton: document.getElementById('closeModalButton'),
-                pauseOverlay: document.getElementById('pauseOverlay'),
-                levelUpModal: document.getElementById('levelUpModal'),
-                closeLevelUpButton: document.getElementById('closeLevelUpButton'),
-                currentLevel: document.getElementById('currentLevel'),
-                countdownOverlay: document.getElementById('countdownOverlay'),
-                countdownNumber: document.getElementById('countdownNumber'),
-                clearHighScoresButton: document.getElementById('clearHighScoresButton')
-            };
-
-            const DIRECTION_MAP = {
-                ArrowUp: 'UP',
-                ArrowDown: 'DOWN',
-                ArrowLeft: 'LEFT',
-                ArrowRight: 'RIGHT',
-                KeyW: 'UP',
-                KeyS: 'DOWN',
-                KeyA: 'LEFT',
-                KeyD: 'RIGHT'
-            };
-
-            const debounce = (func, wait) => {
-                let timeout;
-                return function (...args) {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => func.apply(this, args), wait);
+            document.addEventListener('DOMContentLoaded', () => {
+                const Elements = {
+                    bgm: document.getElementById('bgm'),
+                    eatSound: document.getElementById('eatSound'),
+                    gameOverSound: document.getElementById('gameOverSound'),
+                    score: document.getElementById('score'),
+                    highScore: document.getElementById('highScore'),
+                    highScoreList: document.getElementById('highScoreList'),
+                    level: document.getElementById('level'),
+                    gameOver: document.getElementById('gameOver'),
+                    finalScore: document.getElementById('finalScore'),
+                    startScreen: document.getElementById('startScreen'),
+                    restartButton: document.getElementById('restartButton'),
+                    startButton: document.getElementById('startButton'),
+                    controls: document.getElementById('controls'),
+                    pauseButton: document.getElementById('pauseButton'),
+                    fullscreenButton: document.getElementById('fullscreenButton'),
+                    soundButton: document.getElementById('soundButton'),
+                    themeButton: document.getElementById('themeButton'),
+                    gameContainer: document.getElementById('gameContainer'),
+                    gameCanvas: document.getElementById('gameCanvas'),
+                    instructionsModal: document.getElementById('instructionsModal'),
+                    closeModalButton: document.getElementById('closeModalButton'),
+                    pauseOverlay: document.getElementById('pauseOverlay'),
+                    levelUpModal: document.getElementById('levelUpModal'),
+                    closeLevelUpButton: document.getElementById('closeLevelUpButton'),
+                    currentLevel: document.getElementById('currentLevel'),
+                    countdownOverlay: document.getElementById('countdownOverlay'),
+                    countdownNumber: document.getElementById('countdownNumber'),
+                    clearHighScoresButton: document.getElementById('clearHighScoresButton')
                 };
-            };
 
-            class Renderer {
-                constructor(canvas, colors) {
-                    this.canvas = canvas;
-                    this.ctx = this.canvas.getContext('2d');
-                    this.colors = colors;
-                }
+                const DIRECTION_MAP = {
+                    ArrowUp: 'UP',
+                    ArrowDown: 'DOWN',
+                    ArrowLeft: 'LEFT',
+                    ArrowRight: 'RIGHT',
+                    KeyW: 'UP',
+                    KeyS: 'DOWN',
+                    KeyA: 'LEFT',
+                    KeyD: 'RIGHT'
+                };
 
-                clear(width, height) {
-                    this.ctx.clearRect(0, 0, width, height);
-                }
-
-                drawRect(x, y, width, height, fillStyle) {
-                    this.ctx.fillStyle = fillStyle;
-                    this.ctx.fillRect(x, y, width, height);
-                }
-
-                drawCircle(x, y, radius, fillStyle) {
-                    this.ctx.fillStyle = fillStyle;
-                    this.ctx.beginPath();
-                    this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-                    this.ctx.fill();
-                }
-            }
-
-            class Snake {
-                constructor(box, numCols, colors) {
-                    this.box = box;
-                    this.numCols = numCols;
-                    this.colors = colors;
-                    this.reset();
-                }
-
-                reset() {
-                    this.segments = [{ x: this.box * 5, y: this.box * 5 }];
-                    this.direction = 'RIGHT';
-                    this.directionQueue = [];
-                    this.positions = new Set();
-                    this.positions.add(this.computeIndex(this.segments[0].x, this.segments[0].y));
-                }
-
-                computeIndex(x, y) {
-                    return (x / this.box) + (y / this.box) * this.numCols;
-                }
-
-                enqueueDirection(newDirection) {
-                    const opposite = {
-                        UP: 'DOWN',
-                        DOWN: 'UP',
-                        LEFT: 'RIGHT',
-                        RIGHT: 'LEFT'
+                const debounce = (func, wait) => {
+                    let timeout;
+                    return function (...args) {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(this, args), wait);
                     };
-                    const lastQueued = this.directionQueue[this.directionQueue.length - 1];
-                    if (lastQueued !== opposite[newDirection] && this.direction !== opposite[newDirection]) {
-                        this.directionQueue.push(newDirection);
+                };
+
+                class Renderer {
+                    constructor(canvas, colors) {
+                        this.canvas = canvas;
+                        this.ctx = this.canvas.getContext('2d');
+                        this.colors = colors;
+                    }
+
+                    clear(width, height) {
+                        this.ctx.clearRect(0, 0, width, height);
+                    }
+
+                    drawRect(x, y, width, height, fillStyle) {
+                        this.ctx.fillStyle = fillStyle;
+                        this.ctx.fillRect(x, y, width, height);
+                    }
+
+                    drawCircle(x, y, radius, fillStyle) {
+                        this.ctx.fillStyle = fillStyle;
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+                        this.ctx.fill();
                     }
                 }
 
-                getNextHeadPosition() {
-                    const head = { ...this.segments[0] };
-                    switch (this.direction) {
-                        case 'UP':
-                            head.y -= this.box;
-                            break;
-                        case 'DOWN':
-                            head.y += this.box;
-                            break;
-                        case 'LEFT':
-                            head.x -= this.box;
-                            break;
-                        case 'RIGHT':
-                            head.x += this.box;
-                            break;
+                class Snake {
+                    constructor(box, numCols, colors) {
+                        this.box = box;
+                        this.numCols = numCols;
+                        this.colors = colors;
+                        this.reset();
                     }
-                    return head;
-                }
 
-                move() {
-                    if (this.directionQueue.length > 0) {
-                        this.direction = this.directionQueue.shift();
+                    reset() {
+                        this.segments = [{ x: this.box * 5, y: this.box * 5 }];
+                        this.direction = 'RIGHT';
+                        this.directionQueue = [];
+                        this.positions = new Set();
+                        this.positions.add(this.computeIndex(this.segments[0].x, this.segments[0].y));
                     }
-                    const head = this.getNextHeadPosition();
-                    this.segments.unshift(head);
-                    this.positions.add(this.computeIndex(head.x, head.y));
-                    return head;
-                }
 
-                pop() {
-                    const tail = this.segments.pop();
-                    this.positions.delete(this.computeIndex(tail.x, tail.y));
-                }
-
-                isCollision() {
-                    return this.positions.size !== this.segments.length;
-                }
-
-                draw(renderer) {
-                    // Draw head
-                    renderer.drawRect(this.segments[0].x, this.segments[0].y, this.box, this.box, this.colors.SNAKE_HEAD);
-                    // Draw body
-                    for (let i = 1; i < this.segments.length; i++) {
-                        const segment = this.segments[i];
-                        renderer.drawRect(segment.x, segment.y, this.box, this.box, this.colors.SNAKE_BODY);
+                    computeIndex(x, y) {
+                        return (x / this.box) + (y / this.box) * this.numCols;
                     }
-                }
-            }
 
-            class Food {
-                constructor(box, canvasWidth, canvasHeight, snakeSegments, numCols, colors) {
-                    this.box = box;
-                    this.canvasWidth = canvasWidth;
-                    this.canvasHeight = canvasHeight;
-                    this.snakeSegments = snakeSegments;
-                    this.numCols = numCols;
-                    this.colors = colors;
-                    this.generate();
-                }
-
-                generate() {
-                    let foodX, foodY, index;
-                    do {
-                        foodX = Math.floor((Math.random() * this.canvasWidth) / this.box) * this.box;
-                        foodY = Math.floor((Math.random() * this.canvasHeight) / this.box) * this.box;
-                        index = (foodX / this.box) + (foodY / this.box) * this.numCols;
-                    } while (this.isOnSnake(index));
-                    this.position = { x: foodX, y: foodY };
-                }
-
-                isOnSnake(index) {
-                    return this.snakeSegments.some(segment => (segment.x / this.box) + (segment.y / this.box) * this.numCols === index);
-                }
-
-                draw(renderer) {
-                    renderer.drawCircle(this.position.x + this.box / 2, this.position.y + this.box / 2, this.box / 2.5, this.colors.FOOD);
-                }
-            }
-
-            class Game {
-                constructor() {
-                    this.colors = this.getColors();
-                    this.renderer = new Renderer(Elements.gameCanvas, this.colors);
-                    this.initCanvas();
-                    this.reset();
-                    this.bindEvents();
-                    this.applySavedTheme();
-                }
-
-                getColors() {
-                    const styles = getComputedStyle(document.documentElement);
-                    return {
-                        GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
-                        SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
-                        SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
-                        FOOD: styles.getPropertyValue('--food').trim(),
-                        BORDER: styles.getPropertyValue('--border').trim(),
-                        PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
-                        PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
-                        GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
-                        GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
-                        BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
-                        BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim(),
-                        OVERLAY_BG: styles.getPropertyValue('--overlay-bg').trim(),
-                        OVERLAY_TEXT: styles.getPropertyValue('--overlay-text').trim(),
-                        LIGHT_OVERLAY_BG: styles.getPropertyValue('--light-overlay-bg').trim(),
-                        LIGHT_OVERLAY_TEXT: styles.getPropertyValue('--light-overlay-text').trim()
-                    };
-                }
-
-                initCanvas() {
-                    this.box = 20;
-                    this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
-                    this.setupCanvas();
-                    this.numCols = this.canvasSize / this.box;
-                }
-
-                setupCanvas() {
-                    const dpr = window.devicePixelRatio || 1;
-                    Elements.gameCanvas.width = this.canvasSize * dpr;
-                    Elements.gameCanvas.height = this.canvasSize * dpr;
-                    Elements.gameCanvas.style.width = `${this.canvasSize}px`;
-                    Elements.gameCanvas.style.height = `${this.canvasSize}px`;
-                    this.ctx = Elements.gameCanvas.getContext('2d');
-                    this.ctx.scale(dpr, dpr);
-                    this.scaledWidth = Elements.gameCanvas.width / dpr;
-                    this.scaledHeight = Elements.gameCanvas.height / dpr;
-                }
-
-                reset() {
-                    this.score = 0;
-                    this.level = 1;
-                    this.speed = INITIAL_SPEED;
-                    this.snake = new Snake(this.box, this.numCols, this.colors);
-                    this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
-                    this.isPaused = false;
-                    this.isMuted = false;
-                    this.lastFrameTime = 0;
-                    this.accumulatedTime = 0;
-                    this.hideElements();
-                    this.loadHighScores();
-                    this.updateScore();
-                    this.updateLevel();
-                    this.setupAudio();
-
-                    // Load persisted sound settings
-                    const savedMuted = localStorage.getItem('isMuted') === 'true';
-                    this.isMuted = savedMuted || false;
-                    Elements.bgm.muted = this.isMuted;
-                    Elements.eatSound.muted = this.isMuted;
-                    Elements.gameOverSound.muted = this.isMuted;
-                    this.updateButtons();
-                }
-
-                loadHighScores() {
-                    this.highScores = JSON.parse(localStorage.getItem('highScores')) || [0];
-                    this.updateHighScoreDisplay();
-                }
-
-                saveHighScores() {
-                    localStorage.setItem('highScores', JSON.stringify(this.highScores));
-                }
-
-                updateHighScoreDisplay() {
-                    Elements.highScoreList.innerHTML = '';
-                    this.highScores.forEach((score, index) => {
-                        const li = document.createElement('li');
-                        li.textContent = score;
-                        Elements.highScoreList.appendChild(li);
-                    });
-                }
-
-                saveHighScore() {
-                    if (this.highScores.length < 5 || this.score > this.highScores[this.highScores.length - 1]) {
-                        this.highScores.push(this.score);
-                        this.highScores.sort((a, b) => b - a);
-                        if (this.highScores.length > 5) {
-                            this.highScores.pop();
+                    enqueueDirection(newDirection) {
+                        const opposite = {
+                            UP: 'DOWN',
+                            DOWN: 'UP',
+                            LEFT: 'RIGHT',
+                            RIGHT: 'LEFT'
+                        };
+                        const lastQueued = this.directionQueue[this.directionQueue.length - 1];
+                        if (lastQueued !== opposite[newDirection] && this.direction !== opposite[newDirection]) {
+                            this.directionQueue.push(newDirection);
                         }
-                        this.saveHighScores();
+                    }
+
+                    getNextHeadPosition() {
+                        const head = { ...this.segments[0] };
+                        switch (this.direction) {
+                            case 'UP':
+                                head.y -= this.box;
+                                break;
+                            case 'DOWN':
+                                head.y += this.box;
+                                break;
+                            case 'LEFT':
+                                head.x -= this.box;
+                                break;
+                            case 'RIGHT':
+                                head.x += this.box;
+                                break;
+                        }
+                        return head;
+                    }
+
+                    move() {
+                        if (this.directionQueue.length > 0) {
+                            this.direction = this.directionQueue.shift();
+                        }
+                        const head = this.getNextHeadPosition();
+                        this.segments.unshift(head);
+                        this.positions.add(this.computeIndex(head.x, head.y));
+                        return head;
+                    }
+
+                    pop() {
+                        const tail = this.segments.pop();
+                        this.positions.delete(this.computeIndex(tail.x, tail.y));
+                    }
+
+                    isCollision() {
+                        return this.positions.size !== this.segments.length;
+                    }
+
+                    draw(renderer) {
+                        // Draw head
+                        renderer.drawRect(this.segments[0].x, this.segments[0].y, this.box, this.box, this.colors.SNAKE_HEAD);
+                        // Draw body
+                        for (let i = 1; i < this.segments.length; i++) {
+                            const segment = this.segments[i];
+                            renderer.drawRect(segment.x, segment.y, this.box, this.box, this.colors.SNAKE_BODY);
+                        }
+                    }
+                }
+
+                class Food {
+                    constructor(box, canvasWidth, canvasHeight, snakeSegments, numCols, colors) {
+                        this.box = box;
+                        this.canvasWidth = canvasWidth;
+                        this.canvasHeight = canvasHeight;
+                        this.snakeSegments = snakeSegments;
+                        this.numCols = numCols;
+                        this.colors = colors;
+                        this.generate();
+                    }
+
+                    generate() {
+                        let foodX, foodY, index;
+                        do {
+                            foodX = Math.floor((Math.random() * this.canvasWidth) / this.box) * this.box;
+                            foodY = Math.floor((Math.random() * this.canvasHeight) / this.box) * this.box;
+                            index = (foodX / this.box) + (foodY / this.box) * this.numCols;
+                        } while (this.isOnSnake(index));
+                        this.position = { x: foodX, y: foodY };
+                    }
+
+                    isOnSnake(index) {
+                        return this.snakeSegments.some(segment => (segment.x / this.box) + (segment.y / this.box) * this.numCols === index);
+                    }
+
+                    draw(renderer) {
+                        renderer.drawCircle(this.position.x + this.box / 2, this.position.y + this.box / 2, this.box / 2.5, this.colors.FOOD);
+                    }
+                }
+
+                class Game {
+                    constructor() {
+                        this.colors = this.getColors();
+                        this.renderer = new Renderer(Elements.gameCanvas, this.colors);
+                        this.initCanvas();
+                        this.reset();
+                        this.bindEvents();
+                        this.applySavedTheme();
+                    }
+
+                    getColors() {
+                        const styles = getComputedStyle(document.documentElement);
+                        return {
+                            GAME_BACKGROUND: styles.getPropertyValue('--game-background').trim(),
+                            SNAKE_HEAD: styles.getPropertyValue('--snake-head').trim(),
+                            SNAKE_BODY: styles.getPropertyValue('--snake-body').trim(),
+                            FOOD: styles.getPropertyValue('--food').trim(),
+                            BORDER: styles.getPropertyValue('--border').trim(),
+                            PAUSE_OVERLAY: styles.getPropertyValue('--pause-overlay').trim(),
+                            PAUSE_TEXT: styles.getPropertyValue('--pause-text').trim(),
+                            GAME_OVER_BG: styles.getPropertyValue('--game-over-bg').trim(),
+                            GAME_OVER_TEXT: styles.getPropertyValue('--game-over-text').trim(),
+                            BUTTON_BG: styles.getPropertyValue('--button-bg').trim(),
+                            BUTTON_HOVER_BG: styles.getPropertyValue('--button-hover-bg').trim(),
+                            OVERLAY_BG: styles.getPropertyValue('--overlay-bg').trim(),
+                            OVERLAY_TEXT: styles.getPropertyValue('--overlay-text').trim(),
+                            LIGHT_OVERLAY_BG: styles.getPropertyValue('--light-overlay-bg').trim(),
+                            LIGHT_OVERLAY_TEXT: styles.getPropertyValue('--light-overlay-text').trim()
+                        };
+                    }
+
+                    initCanvas() {
+                        this.box = 20;
+                        this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
+                        this.setupCanvas();
+                        this.numCols = this.canvasSize / this.box;
+                    }
+
+                    setupCanvas() {
+                        const dpr = window.devicePixelRatio || 1;
+                        Elements.gameCanvas.width = this.canvasSize * dpr;
+                        Elements.gameCanvas.height = this.canvasSize * dpr;
+                        Elements.gameCanvas.style.width = `${this.canvasSize}px`;
+                        Elements.gameCanvas.style.height = `${this.canvasSize}px`;
+                        this.ctx = Elements.gameCanvas.getContext('2d');
+                        this.ctx.scale(dpr, dpr);
+                        this.scaledWidth = Elements.gameCanvas.width / dpr;
+                        this.scaledHeight = Elements.gameCanvas.height / dpr;
+                    }
+
+                    reset() {
+                        this.score = 0;
+                        this.level = 1;
+                        this.speed = INITIAL_SPEED;
+                        this.snake = new Snake(this.box, this.numCols, this.colors);
+                        this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
+                        this.isPaused = false;
+                        this.isMuted = false;
+                        this.lastFrameTime = 0;
+                        this.accumulatedTime = 0;
+                        this.hideElements();
+                        this.loadHighScores();
+                        this.updateScore();
+                        this.updateLevel();
+                        this.setupAudio();
+
+                        // Load persisted sound settings
+                        const savedMuted = localStorage.getItem('isMuted') === 'true';
+                        this.isMuted = savedMuted || false;
+                        Elements.bgm.muted = this.isMuted;
+                        Elements.eatSound.muted = this.isMuted;
+                        Elements.gameOverSound.muted = this.isMuted;
+                        this.updateButtons();
+                    }
+
+                    loadHighScores() {
+                        this.highScores = JSON.parse(localStorage.getItem('highScores')) || [0];
                         this.updateHighScoreDisplay();
-                        if (this.highScores[0] === this.score) {
-                            Elements.highScoreList.children[0].classList.add('new-high-score');
-                            setTimeout(() => Elements.highScoreList.children[0].classList.remove('new-high-score'), 1000);
+                    }
+
+                    saveHighScores() {
+                        localStorage.setItem('highScores', JSON.stringify(this.highScores));
+                    }
+
+                    updateHighScoreDisplay() {
+                        Elements.highScoreList.innerHTML = '';
+                        this.highScores.forEach((score, index) => {
+                            const li = document.createElement('li');
+                            li.textContent = score;
+                            Elements.highScoreList.appendChild(li);
+                        });
+                    }
+
+                    saveHighScore() {
+                        if (this.highScores.length < 5 || this.score > this.highScores[this.highScores.length - 1]) {
+                            this.highScores.push(this.score);
+                            this.highScores.sort((a, b) => b - a);
+                            if (this.highScores.length > 5) {
+                                this.highScores.pop();
+                            }
+                            this.saveHighScores();
+                            this.updateHighScoreDisplay();
+                            if (this.highScores[0] === this.score) {
+                                Elements.highScoreList.children[0].classList.add('new-high-score');
+                                setTimeout(() => Elements.highScoreList.children[0].classList.remove('new-high-score'), 1000);
+                            }
                         }
                     }
-                }
 
-                updateScore() {
-                    Elements.score.textContent = `Score: ${this.score}`;
-                    this.updateHighScoreDisplay();
-                }
+                    updateScore() {
+                        Elements.score.textContent = `Score: ${this.score}`;
+                        this.updateHighScoreDisplay();
+                    }
 
-                updateLevel() {
-                    Elements.level.textContent = `Level: ${this.level}`;
-                }
+                    updateLevel() {
+                        Elements.level.textContent = `Level: ${this.level}`;
+                    }
 
-                setupAudio() {
-                    Elements.bgm.volume = 0.5;
-                    // Removed initial play to handle audio after user interaction
-                }
+                    setupAudio() {
+                        Elements.bgm.volume = 0.5;
+                        // Removed initial play to handle audio after user interaction
+                    }
 
-                hideElements() {
-                    Elements.gameOver.style.display = 'none';
-                    Elements.startScreen.style.display = 'none';
-                    Elements.instructionsModal.classList.remove('active');
-                    Elements.pauseOverlay.classList.remove('active');
-                    Elements.levelUpModal.style.display = 'none';
-                    Elements.countdownOverlay.classList.remove('active');
-                }
+                    hideElements() {
+                        Elements.gameOver.style.display = 'none';
+                        Elements.startScreen.style.display = 'none';
+                        Elements.instructionsModal.classList.remove('active');
+                        Elements.pauseOverlay.classList.remove('active');
+                        Elements.levelUpModal.style.display = 'none';
+                        Elements.countdownOverlay.classList.remove('active');
+                    }
 
-                bindEvents() {
-                    document.addEventListener('keydown', this.handleKeyDown.bind(this));
-                    document.addEventListener('keyup', this.handleKeyUp.bind(this));
-                    Elements.gameContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-                    Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
-                    Elements.restartButton.addEventListener('click', this.restart.bind(this));
-                    Elements.startButton.addEventListener('click', this.start.bind(this));
-                    Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
-                    Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
-                    Elements.controls.addEventListener('click', this.handleControlClick.bind(this));
-                    Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
-                    Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
-                    Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
-                    Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
-                    Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
-                    window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
-                    document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-                    // Open instructions modal on start
-                    Elements.startButton.addEventListener('click', () => {
+                    bindEvents() {
+                        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                        document.addEventListener('keyup', this.handleKeyUp.bind(this));
+                        Elements.gameContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+                        Elements.gameContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+                        Elements.restartButton.addEventListener('click', this.restart.bind(this));
+                        Elements.startButton.addEventListener('click', this.start.bind(this));
+                        Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
+                        Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
+                        Elements.controls.addEventListener('click', this.handleControlClick.bind(this));
+                        Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
+                        Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
+                        Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
+                        Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
+                        Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
+                        window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
+                        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+                        // Open instructions modal on start
+                        Elements.startButton.addEventListener('click', () => {
+                            Elements.instructionsModal.classList.add('active');
+                            this.pause();
+                        });
+                    }
+
+                    handleKeyDown(event) {
+                        const direction = DIRECTION_MAP[event.code] || DIRECTION_MAP[event.key];
+                        if (direction) {
+                            this.snake.enqueueDirection(direction);
+                        }
+                        if (event.code === 'Space') {
+                            this.togglePause();
+                        }
+                    }
+
+                    handleKeyUp(event) {
+                        if (event.key === 'Enter' && this.gameOver.style.display === 'block') {
+                            this.restart();
+                        }
+                    }
+
+                    handleTouchStart(event) {
+                        const touch = event.touches[0];
+                        this.touchStartX = touch.clientX;
+                        this.touchStartY = touch.clientY;
+                    }
+
+                    handleTouchEnd(event) {
+                        if (this.touchStartX === undefined || this.touchStartY === undefined) return;
+
+                        const touch = event.changedTouches[0];
+                        const touchEndX = touch.clientX;
+                        const touchEndY = touch.clientY;
+
+                        const dx = touchEndX - this.touchStartX;
+                        const dy = touchEndY - this.touchStartY;
+
+                        let direction = '';
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            direction = dx > 0 ? 'RIGHT' : 'LEFT';
+                        } else {
+                            direction = dy > 0 ? 'DOWN' : 'UP';
+                        }
+
+                        if (direction) this.snake.enqueueDirection(direction);
+
+                        this.touchStartX = undefined;
+                        this.touchStartY = undefined;
+                    }
+
+                    handleResize() {
+                        this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
+                        this.setupCanvas();
+                        this.numCols = this.canvasSize / this.box;
+                        this.reset();
+                    }
+
+                    handleVisibilityChange() {
+                        if (document.hidden && !this.isPaused) {
+                            this.pause();
+                        }
+                    }
+
+                    handleControlClick(event) {
+                        const button = event.target.closest('.control-button[data-direction]');
+                        if (button) {
+                            const direction = button.getAttribute('data-direction');
+                            this.snake.enqueueDirection(direction);
+                        }
+                    }
+
+                    togglePause() {
+                        this.isPaused ? this.resume() : this.pause();
+                    }
+
+                    pause() {
+                        if (!this.isPaused) {
+                            this.isPaused = true;
+                            cancelAnimationFrame(this.gameLoop);
+                            Elements.pauseOverlay.classList.add('active');
+                            Elements.pauseButton.textContent = '▶️';
+                            Elements.bgm.pause();
+                        }
+                    }
+
+                    resume() {
+                        if (this.isPaused) {
+                            this.isPaused = false;
+                            Elements.pauseOverlay.classList.remove('active');
+                            this.lastFrameTime = performance.now();
+                            this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                            Elements.pauseButton.textContent = '⏸️';
+                            if (!this.isMuted) Elements.bgm.play();
+                        }
+                    }
+
+                    toggleFullScreen() {
+                        if (!document.fullscreenElement) {
+                            Elements.gameContainer.requestFullscreen().catch(err => {
+                                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                            });
+                            Elements.fullscreenButton.textContent = '🗗';
+                        } else {
+                            document.exitFullscreen();
+                            Elements.fullscreenButton.textContent = '⛶';
+                        }
+                    }
+
+                    toggleSound() {
+                        this.isMuted = !this.isMuted;
+                        Elements.bgm.muted = this.isMuted;
+                        Elements.eatSound.muted = this.isMuted;
+                        Elements.gameOverSound.muted = this.isMuted;
+                        Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
+                        localStorage.setItem('isMuted', this.isMuted);
+                    }
+
+                    toggleTheme() {
+                        document.body.classList.toggle('light-mode');
+                        const isLight = document.body.classList.contains('light-mode');
+                        Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
+                        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                        // Update colors after theme toggle
+                        this.colors = this.getColors();
+                        this.renderer.colors = this.colors;
+                        this.snake.colors = this.colors;
+                        this.food.colors = this.colors;
+                    }
+
+                    applySavedTheme() {
+                        const savedTheme = localStorage.getItem('theme');
+                        if (savedTheme === 'light') {
+                            document.body.classList.add('light-mode');
+                            Elements.themeButton.textContent = '☀️';
+                        } else {
+                            document.body.classList.remove('light-mode');
+                            Elements.themeButton.textContent = '🌙';
+                        }
+                        // Update colors based on theme
+                        this.colors = this.getColors();
+                        if (this.renderer) {
+                            this.renderer.colors = this.colors;
+                        }
+                    }
+
+                    start() {
+                        Elements.startScreen.style.display = 'none';
                         Elements.instructionsModal.classList.add('active');
                         this.pause();
-                    });
-                }
-
-                handleKeyDown(event) {
-                    const direction = DIRECTION_MAP[event.code] || DIRECTION_MAP[event.key];
-                    if (direction) {
-                        this.snake.enqueueDirection(direction);
-                    }
-                    if (event.code === 'Space') {
-                        this.togglePause();
-                    }
-                }
-
-                handleKeyUp(event) {
-                    if (event.key === 'Enter' && this.gameOver.style.display === 'block') {
-                        this.restart();
-                    }
-                }
-
-                handleTouchStart(event) {
-                    const touch = event.touches[0];
-                    this.touchStartX = touch.clientX;
-                    this.touchStartY = touch.clientY;
-                }
-
-                handleTouchEnd(event) {
-                    if (this.touchStartX === undefined || this.touchStartY === undefined) return;
-
-                    const touch = event.changedTouches[0];
-                    const touchEndX = touch.clientX;
-                    const touchEndY = touch.clientY;
-
-                    const dx = touchEndX - this.touchStartX;
-                    const dy = touchEndY - this.touchStartY;
-
-                    let direction = '';
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        direction = dx > 0 ? 'RIGHT' : 'LEFT';
-                    } else {
-                        direction = dy > 0 ? 'DOWN' : 'UP';
                     }
 
-                    if (direction) this.snake.enqueueDirection(direction);
+                    showCountdown(callback) {
+                        let count = COUNTDOWN_START;
+                        Elements.countdownNumber.textContent = count;
+                        Elements.countdownOverlay.classList.add('active');
+                        const countdownInterval = setInterval(() => {
+                            count -= 1;
+                            if (count === 0) {
+                                clearInterval(countdownInterval);
+                                Elements.countdownOverlay.classList.remove('active');
+                                callback();
+                            } else {
+                                Elements.countdownNumber.textContent = count;
+                            }
+                        }, 1000);
+                    }
 
-                    this.touchStartX = undefined;
-                    this.touchStartY = undefined;
-                }
+                    closeModal() {
+                        Elements.instructionsModal.classList.remove('active');
+                        this.showCountdown(() => {
+                            this.reset();
+                            this.playBackgroundMusic();
+                            this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                        });
+                    }
 
-                handleResize() {
-                    this.canvasSize = Math.min(window.innerWidth * 0.9, 600);
-                    this.setupCanvas();
-                    this.numCols = this.canvasSize / this.box;
-                    this.reset();
-                }
+                    restart() {
+                        Elements.gameOver.style.display = 'none';
+                        this.showCountdown(() => {
+                            this.reset();
+                            this.playBackgroundMusic();
+                            this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                        });
+                    }
 
-                handleVisibilityChange() {
-                    if (document.hidden && !this.isPaused) {
+                    playBackgroundMusic() {
+                        Elements.bgm.play().catch(() => {
+                            // User interaction required to play audio
+                            // Audio will be played when user interacts next
+                        });
+                    }
+
+                    showLevelUpModal() {
+                        Elements.currentLevel.textContent = this.level;
+                        Elements.levelUpModal.style.display = 'block';
                         this.pause();
                     }
-                }
 
-                handleControlClick(event) {
-                    const button = event.target.closest('.control-button[data-direction]');
-                    if (button) {
-                        const direction = button.getAttribute('data-direction');
-                        this.snake.enqueueDirection(direction);
+                    closeLevelUpModal() {
+                        Elements.levelUpModal.style.display = 'none';
+                        this.resume();
                     }
-                }
 
-                togglePause() {
-                    this.isPaused ? this.resume() : this.pause();
-                }
+                    gameCycle(timestamp) {
+                        if (!this.lastFrameTime) this.lastFrameTime = timestamp;
+                        const deltaTime = timestamp - this.lastFrameTime;
+                        this.lastFrameTime = timestamp;
+                        this.accumulatedTime += deltaTime;
 
-                pause() {
-                    if (!this.isPaused) {
+                        while (this.accumulatedTime > this.speed) {
+                            if (!this.isPaused) this.update();
+                            this.accumulatedTime -= this.speed;
+                        }
+
+                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                    }
+
+                    update() {
+                        const head = this.snake.move();
+
+                        if (this.checkCollision(head)) {
+                            this.endGame();
+                            return;
+                        }
+
+                        if (this.isEating(head)) {
+                            this.score += 10;
+                            this.updateScore();
+                            this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
+                            this.increaseSpeed();
+                            this.checkLevelUp();
+                            Elements.eatSound.play();
+                        } else {
+                            this.snake.pop();
+                        }
+
+                        this.render();
+                    }
+
+                    checkCollision(head) {
+                        return head.x < 0 || head.x >= this.scaledWidth || head.y < 0 || head.y >= this.scaledHeight || this.snake.isCollision();
+                    }
+
+                    isEating(head) {
+                        return head.x === this.food.position.x && head.y === this.food.position.y;
+                    }
+
+                    increaseSpeed() {
+                        if (this.speed > MIN_SPEED) this.speed -= SPEED_INCREMENT;
+                    }
+
+                    checkLevelUp() {
+                        if (this.score >= this.level * SCORE_PER_LEVEL) {
+                            this.level += 1;
+                            this.updateLevel();
+                            this.speed = Math.max(this.speed - LEVEL_SPEED_INCREMENT, MIN_SPEED);
+                            this.showLevelUpModal();
+                        }
+                    }
+
+                    render() {
+                        this.renderer.clear(this.scaledWidth, this.scaledHeight);
+                        this.food.draw(this.renderer);
+                        this.snake.draw(this.renderer);
+                    }
+
+                    endGame() {
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
-                        Elements.pauseOverlay.classList.add('active');
-                        Elements.pauseButton.textContent = '▶️';
                         Elements.bgm.pause();
+                        Elements.gameOverSound.play();
+                        Elements.finalScore.textContent = this.score;
+                        Elements.gameOver.style.display = 'block';
+                        this.saveHighScore();
                     }
-                }
 
-                resume() {
-                    if (this.isPaused) {
-                        this.isPaused = false;
-                        Elements.pauseOverlay.classList.remove('active');
-                        this.lastFrameTime = performance.now();
-                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                        Elements.pauseButton.textContent = '⏸️';
-                        if (!this.isMuted) Elements.bgm.play();
+                    updateButtons() {
+                        Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
                     }
-                }
 
-                toggleFullScreen() {
-                    if (!document.fullscreenElement) {
-                        Elements.gameContainer.requestFullscreen().catch(err => {
-                            console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-                        });
-                        Elements.fullscreenButton.textContent = '🗗';
-                    } else {
-                        document.exitFullscreen();
-                        Elements.fullscreenButton.textContent = '⛶';
-                    }
-                }
-
-                toggleSound() {
-                    this.isMuted = !this.isMuted;
-                    Elements.bgm.muted = this.isMuted;
-                    Elements.eatSound.muted = this.isMuted;
-                    Elements.gameOverSound.muted = this.isMuted;
-                    Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
-                    localStorage.setItem('isMuted', this.isMuted);
-                }
-
-                toggleTheme() {
-                    document.body.classList.toggle('light-mode');
-                    const isLight = document.body.classList.contains('light-mode');
-                    Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
-                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-                    // Update colors after theme toggle
-                    this.colors = this.getColors();
-                    this.renderer.colors = this.colors;
-                    this.snake.colors = this.colors;
-                    this.food.colors = this.colors;
-                }
-
-                applySavedTheme() {
-                    const savedTheme = localStorage.getItem('theme');
-                    if (savedTheme === 'light') {
-                        document.body.classList.add('light-mode');
-                        Elements.themeButton.textContent = '☀️';
-                    } else {
-                        document.body.classList.remove('light-mode');
-                        Elements.themeButton.textContent = '🌙';
-                    }
-                    // Update colors based on theme
-                    this.colors = this.getColors();
-                    if (this.renderer) {
-                        this.renderer.colors = this.colors;
-                    }
-                }
-
-                start() {
-                    Elements.startScreen.style.display = 'none';
-                    Elements.instructionsModal.classList.add('active');
-                    this.pause();
-                }
-
-                showCountdown(callback) {
-                    let count = COUNTDOWN_START;
-                    Elements.countdownNumber.textContent = count;
-                    Elements.countdownOverlay.classList.add('active');
-                    const countdownInterval = setInterval(() => {
-                        count -= 1;
-                        if (count === 0) {
-                            clearInterval(countdownInterval);
-                            Elements.countdownOverlay.classList.remove('active');
-                            callback();
-                        } else {
-                            Elements.countdownNumber.textContent = count;
+                    clearHighScores() {
+                        if (confirm('Are you sure you want to clear all high scores?')) {
+                            this.highScores = [0];
+                            this.saveHighScores();
+                            this.updateHighScoreDisplay();
                         }
-                    }, 1000);
-                }
-
-                closeModal() {
-                    Elements.instructionsModal.classList.remove('active');
-                    this.showCountdown(() => {
-                        this.reset();
-                        this.playBackgroundMusic();
-                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                    });
-                }
-
-                restart() {
-                    Elements.gameOver.style.display = 'none';
-                    this.showCountdown(() => {
-                        this.reset();
-                        this.playBackgroundMusic();
-                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                    });
-                }
-
-                playBackgroundMusic() {
-                    Elements.bgm.play().catch(() => {
-                        // User interaction required to play audio
-                        // Audio will be played when user interacts next
-                    });
-                }
-
-                showLevelUpModal() {
-                    Elements.currentLevel.textContent = this.level;
-                    Elements.levelUpModal.style.display = 'block';
-                    this.pause();
-                }
-
-                closeLevelUpModal() {
-                    Elements.levelUpModal.style.display = 'none';
-                    this.resume();
-                }
-
-                gameCycle(timestamp) {
-                    if (!this.lastFrameTime) this.lastFrameTime = timestamp;
-                    const deltaTime = timestamp - this.lastFrameTime;
-                    this.lastFrameTime = timestamp;
-                    this.accumulatedTime += deltaTime;
-
-                    while (this.accumulatedTime > this.speed) {
-                        if (!this.isPaused) this.update();
-                        this.accumulatedTime -= this.speed;
-                    }
-
-                    this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                }
-
-                update() {
-                    const head = this.snake.move();
-
-                    if (this.checkCollision(head)) {
-                        this.endGame();
-                        return;
-                    }
-
-                    if (this.isEating(head)) {
-                        this.score += 10;
-                        this.updateScore();
-                        this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
-                        this.increaseSpeed();
-                        this.checkLevelUp();
-                        Elements.eatSound.play();
-                    } else {
-                        this.snake.pop();
-                    }
-
-                    this.render();
-                }
-
-                checkCollision(head) {
-                    return head.x < 0 || head.x >= this.scaledWidth || head.y < 0 || head.y >= this.scaledHeight || this.snake.isCollision();
-                }
-
-                isEating(head) {
-                    return head.x === this.food.position.x && head.y === this.food.position.y;
-                }
-
-                increaseSpeed() {
-                    if (this.speed > MIN_SPEED) this.speed -= SPEED_INCREMENT;
-                }
-
-                checkLevelUp() {
-                    if (this.score >= this.level * SCORE_PER_LEVEL) {
-                        this.level += 1;
-                        this.updateLevel();
-                        this.speed = Math.max(this.speed - LEVEL_SPEED_INCREMENT, MIN_SPEED);
-                        this.showLevelUpModal();
                     }
                 }
 
-                render() {
-                    this.renderer.clear(this.scaledWidth, this.scaledHeight);
-                    this.food.draw(this.renderer);
-                    this.snake.draw(this.renderer);
-                }
-
-                endGame() {
-                    this.isPaused = true;
-                    cancelAnimationFrame(this.gameLoop);
-                    Elements.bgm.pause();
-                    Elements.gameOverSound.play();
-                    Elements.finalScore.textContent = this.score;
-                    Elements.gameOver.style.display = 'block';
-                    this.saveHighScore();
-                }
-
-                updateButtons() {
-                    Elements.soundButton.textContent = this.isMuted ? '🔇' : '🔊';
-                }
-
-                clearHighScores() {
-                    if (confirm('Are you sure you want to clear all high scores?')) {
-                        this.highScores = [0];
-                        this.saveHighScores();
-                        this.updateHighScoreDisplay();
-                    }
-                }
-            }
-
-            const game = new Game();
-            game.reset();
-            Elements.startScreen.style.display = 'block';
-        });
+                const game = new Game();
+                game.reset();
+                Elements.startScreen.style.display = 'block';
+            });
+        })();
     </script>
 </body>
 
