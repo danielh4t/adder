@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game – Enhanced User Experience with Responsive Controls</title>
+    <title>Snake Game – Enhanced User Experience with Haptic Feedback</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -1155,6 +1155,9 @@
                             this.increaseSpeed();
                             this.checkLevelUp();
                             Elements.eatSound.play();
+                            if ('vibrate' in navigator) {
+                                navigator.vibrate(100);
+                            }
                         } else {
                             this.snake.pop();
                         }
@@ -1194,6 +1197,9 @@
                         cancelAnimationFrame(this.gameLoop);
                         Elements.bgm.pause();
                         Elements.gameOverSound.play();
+                        if ('vibrate' in navigator) {
+                            navigator.vibrate([500, 200, 500]);
+                        }
                         Elements.finalScore.textContent = this.score;
                         Elements.gameOver.style.display = 'block';
                         this.saveHighScore();
