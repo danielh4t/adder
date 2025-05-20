@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game – Enhanced User Experience with Haptic Feedback</title>
+    <title>Snake Game – Enhanced Fullscreen Toggle Usability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -572,7 +572,7 @@
         </div>
     </main>
     <script>
-        (function() {
+        (function () {
             'use strict';
 
             const INITIAL_SPEED = 150;
@@ -921,11 +921,28 @@
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+                        document.addEventListener('fullscreenchange', this.updateFullscreenButton.bind(this));
                         // Open instructions modal on start
                         Elements.startButton.addEventListener('click', () => {
                             Elements.instructionsModal.classList.add('active');
                             this.pause();
                         });
+                    }
+
+                    handleFullscreenChange() {
+                        if (document.fullscreenElement) {
+                            Elements.fullscreenButton.textContent = '🗗';
+                        } else {
+                            Elements.fullscreenButton.textContent = '⛶';
+                        }
+                    }
+
+                    updateFullscreenButton() {
+                        if (document.fullscreenElement) {
+                            Elements.fullscreenButton.textContent = '🗗';
+                        } else {
+                            Elements.fullscreenButton.textContent = '⛶';
+                        }
                     }
 
                     handleKeyDown(event) {
@@ -1024,10 +1041,8 @@
                             Elements.gameContainer.requestFullscreen().catch(err => {
                                 console.error(`Error attempting to enable full-screen mode: ${err.message}`);
                             });
-                            Elements.fullscreenButton.textContent = '🗗';
                         } else {
                             document.exitFullscreen();
-                            Elements.fullscreenButton.textContent = '⛶';
                         }
                     }
 
