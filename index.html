@@ -142,10 +142,11 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.8);
-            padding: 40px 60px;
+            padding: 30px 40px;
             border-radius: 20px;
             text-align: center;
             font-size: 24px;
+            max-width: 90%;
             display: none;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
             animation: fadeInScale 0.5s forwards;
@@ -186,8 +187,7 @@
         .start-screen button,
         .level-up-modal button,
         .countdown-overlay button,
-        .modal button,
-        .theme-button {
+        .modal button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -198,6 +198,29 @@
             cursor: pointer;
             transition: background var(--transition-duration) ease, transform 0.2s ease, box-shadow var(--transition-duration) ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Styling for the Clear High Scores button */
+        .clear-hs-button {
+            margin-top: 10px; /* Or adjust as needed */
+            padding: 8px 15px; /* Consistent with smaller buttons */
+            background: var(--special-button-bg); /* Or a different color */
+            color: #fff;
+            border: none;
+            border-radius: 10px; /* Consistent with other buttons */
+            font-size: 14px; /* Or adjust */
+            cursor: pointer;
+            transition: background var(--transition-duration) ease, transform 0.2s ease, box-shadow var(--transition-duration) ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .clear-hs-button:hover {
+            background: var(--special-button-hover-bg); /* Consistent hover */
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .clear-hs-button:active {
+            background: var(--special-button-hover-bg); /* Consistent active state */
+            transform: scale(0.95);
         }
 
         button:hover {
@@ -299,7 +322,7 @@
             .start-screen,
             .level-up-modal,
             .countdown-overlay {
-                padding: 50px 80px;
+                padding: 40px 60px;
                 font-size: 26px;
             }
 
@@ -346,7 +369,7 @@
             left: 50%;
             transform: translate(-50%, 0);
             background: var(--modal-background);
-            padding: 20px 40px;
+            padding: 20px 30px;
             border-radius: 15px;
             text-align: center;
             color: var(--modal-text);
@@ -354,6 +377,8 @@
             z-index: 3;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             animation: fadeIn 0.5s forwards;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .modal.active {
@@ -522,8 +547,7 @@
                 <ol id="highScoreList">
                     <li>0</li>
                 </ol>
-                <button id="clearHighScoresButton" aria-label="Clear High Scores"
-                    style="margin-top: 10px; padding: 6px 12px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; background: #ff6347; color: #fff;">
+                <button id="clearHighScoresButton" class="clear-hs-button" aria-label="Clear High Scores">
                     Clear High Scores
                 </button>
             </div>
