@@ -142,11 +142,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.8);
-            padding: 30px 40px;
+            padding: 40px 60px;
             border-radius: 20px;
             text-align: center;
             font-size: 24px;
-            max-width: 90%;
             display: none;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
             animation: fadeInScale 0.5s forwards;
@@ -187,7 +186,8 @@
         .start-screen button,
         .level-up-modal button,
         .countdown-overlay button,
-        .modal button {
+        .modal button,
+        .theme-button {
             margin-top: 20px;
             padding: 12px 25px;
             background: var(--button-bg);
@@ -198,29 +198,6 @@
             cursor: pointer;
             transition: background var(--transition-duration) ease, transform 0.2s ease, box-shadow var(--transition-duration) ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Styling for the Clear High Scores button */
-        .clear-hs-button {
-            margin-top: 10px; /* Or adjust as needed */
-            padding: 8px 15px; /* Consistent with smaller buttons */
-            background: var(--special-button-bg); /* Or a different color */
-            color: #fff;
-            border: none;
-            border-radius: 10px; /* Consistent with other buttons */
-            font-size: 14px; /* Or adjust */
-            cursor: pointer;
-            transition: background var(--transition-duration) ease, transform 0.2s ease, box-shadow var(--transition-duration) ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-        .clear-hs-button:hover {
-            background: var(--special-button-hover-bg); /* Consistent hover */
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .clear-hs-button:active {
-            background: var(--special-button-hover-bg); /* Consistent active state */
-            transform: scale(0.95);
         }
 
         button:hover {
@@ -322,7 +299,7 @@
             .start-screen,
             .level-up-modal,
             .countdown-overlay {
-                padding: 40px 60px;
+                padding: 50px 80px;
                 font-size: 26px;
             }
 
@@ -369,7 +346,7 @@
             left: 50%;
             transform: translate(-50%, 0);
             background: var(--modal-background);
-            padding: 20px 30px;
+            padding: 20px 40px;
             border-radius: 15px;
             text-align: center;
             color: var(--modal-text);
@@ -377,8 +354,6 @@
             z-index: 3;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             animation: fadeIn 0.5s forwards;
-            max-height: 80vh;
-            overflow-y: auto;
         }
 
         .modal.active {
@@ -547,7 +522,8 @@
                 <ol id="highScoreList">
                     <li>0</li>
                 </ol>
-                <button id="clearHighScoresButton" class="clear-hs-button" aria-label="Clear High Scores">
+                <button id="clearHighScoresButton" aria-label="Clear High Scores"
+                    style="margin-top: 10px; padding: 6px 12px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; background: #ff6347; color: #fff;">
                     Clear High Scores
                 </button>
             </div>
@@ -624,10 +600,10 @@
                     restartButton: document.getElementById('restartButton'),
                     startButton: document.getElementById('startButton'),
                     controls: document.getElementById('controls'),
-                    pauseButton: document.getElementById('pauseButton'),
-                    fullscreenButton: document.getElementById('fullscreenButton'),
-                    soundButton: document.getElementById('soundButton'),
-                    themeButton: document.getElementById('themeButton'),
+                    // pauseButton: document.getElementById('pauseButton'), // Removed
+                    // fullscreenButton: document.getElementById('fullscreenButton'), // Removed
+                    soundButton: document.getElementById('soundButton'), // Sound button JS is removed in a later step if not already
+                    // themeButton: document.getElementById('themeButton'), // Removed
                     gameContainer: document.getElementById('gameContainer'),
                     gameCanvas: document.getElementById('gameCanvas'),
                     instructionsModal: document.getElementById('instructionsModal'),
@@ -853,6 +829,7 @@
                         this.snake = new Snake(this.box, this.numCols, this.colors);
                         this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
                         this.isPaused = false;
+                        this.isGameOver = false; // Initialize isGameOver
                         this.isMuted = false;
                         this.lastFrameTime = 0;
                         this.accumulatedTime = 0;
@@ -861,6 +838,7 @@
                         this.updateScore();
                         this.updateLevel();
                         this.setupAudio();
+                        // this.applySavedTheme(); // Removed
 
                         // Load persisted sound settings
                         const savedMuted = localStorage.getItem('isMuted') === 'true';
@@ -868,7 +846,7 @@
                         Elements.bgm.muted = this.isMuted;
                         Elements.eatSound.muted = this.isMuted;
                         Elements.gameOverSound.muted = this.isMuted;
-                        this.updateButtons();
+                        this.updateButtons(); // This updates the sound button, keep for now
                     }
 
                     loadHighScores() {
@@ -938,14 +916,15 @@
                         Elements.closeModalButton.addEventListener('click', this.closeModal.bind(this));
                         Elements.closeLevelUpButton.addEventListener('click', this.closeLevelUpModal.bind(this));
                         Elements.controls.addEventListener('click', this.handleControlClick.bind(this));
-                        Elements.pauseButton.addEventListener('click', this.togglePause.bind(this));
-                        Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this));
+                        // Elements.pauseButton.addEventListener('click', this.togglePause.bind(this)); // Pause is via Spacebar
+                        // Elements.fullscreenButton.addEventListener('click', this.toggleFullScreen.bind(this)); // Removed
                         Elements.soundButton.addEventListener('click', this.toggleSound.bind(this));
-                        Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this));
+                        // Elements.themeButton.addEventListener('click', this.toggleTheme.bind(this)); // Removed
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-                        document.addEventListener('fullscreenchange', this.updateFullscreenButton.bind(this));
+                        // document.addEventListener('fullscreenchange', this.updateFullscreenButton.bind(this)); // Removed
+
                         // Open instructions modal on start
                         Elements.startButton.addEventListener('click', () => {
                             Elements.instructionsModal.classList.add('active');
@@ -953,23 +932,15 @@
                         });
                     }
 
-                    handleFullscreenChange() {
-                        if (document.fullscreenElement) {
-                            Elements.fullscreenButton.textContent = '🗗';
-                        } else {
-                            Elements.fullscreenButton.textContent = '⛶';
-                        }
-                    }
-
-                    updateFullscreenButton() {
-                        if (document.fullscreenElement) {
-                            Elements.fullscreenButton.textContent = '🗗';
-                        } else {
-                            Elements.fullscreenButton.textContent = '⛶';
-                        }
-                    }
+                    // handleFullscreenChange() removed
+                    // updateFullscreenButton() removed
 
                     handleKeyDown(event) {
+                        if (this.isGameOver) {
+                            this.restart();
+                            return; // Prevent other key handling like direction changes
+                        }
+
                         const direction = DIRECTION_MAP[event.code] || DIRECTION_MAP[event.key];
                         if (direction) {
                             this.snake.enqueueDirection(direction);
@@ -980,9 +951,9 @@
                     }
 
                     handleKeyUp(event) {
-                        if (event.key === 'Enter' && this.gameOver.style.display === 'block') {
-                            this.restart();
-                        }
+                        // if (event.key === 'Enter' && this.gameOver.style.display === 'block') { // Original restart trigger
+                        //     this.restart();
+                        // }
                     }
 
                     handleTouchStart(event) {
@@ -1036,39 +1007,31 @@
                     }
 
                     togglePause() {
-                        this.isPaused ? this.resume() : this.pause();
+                        if (this.isGameOver) return; // Should already be handled by keydown, but good check
+
+                        if (this.isPaused) {
+                            this.resume();
+                        } else {
+                            this.pause();
+                        }
                     }
 
                     pause() {
-                        if (!this.isPaused) {
-                            this.isPaused = true;
-                            cancelAnimationFrame(this.gameLoop);
-                            Elements.pauseOverlay.classList.add('active');
-                            Elements.pauseButton.textContent = '▶️';
-                            Elements.bgm.pause();
-                        }
+                        // Removed check for !this.isPaused because togglePause now handles it
+                        this.isPaused = true;
+                        cancelAnimationFrame(this.gameLoop);
+                        // Removed pause button text change
                     }
 
                     resume() {
-                        if (this.isPaused) {
-                            this.isPaused = false;
-                            Elements.pauseOverlay.classList.remove('active');
-                            this.lastFrameTime = performance.now();
-                            this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                            Elements.pauseButton.textContent = '⏸️';
-                            if (!this.isMuted) Elements.bgm.play();
-                        }
+                        // Removed check for this.isPaused
+                        this.isPaused = false;
+                        this.lastFrameTime = performance.now(); // Important to reset frame timing
+                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
+                        // Removed pause button text change
                     }
 
-                    toggleFullScreen() {
-                        if (!document.fullscreenElement) {
-                            Elements.gameContainer.requestFullscreen().catch(err => {
-                                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-                            });
-                        } else {
-                            document.exitFullscreen();
-                        }
-                    }
+                    // toggleFullScreen() removed
 
                     toggleSound() {
                         this.isMuted = !this.isMuted;
@@ -1079,33 +1042,8 @@
                         localStorage.setItem('isMuted', this.isMuted);
                     }
 
-                    toggleTheme() {
-                        document.body.classList.toggle('light-mode');
-                        const isLight = document.body.classList.contains('light-mode');
-                        Elements.themeButton.textContent = isLight ? '☀️' : '🌙';
-                        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-                        // Update colors after theme toggle
-                        this.colors = this.getColors();
-                        this.renderer.colors = this.colors;
-                        this.snake.colors = this.colors;
-                        this.food.colors = this.colors;
-                    }
-
-                    applySavedTheme() {
-                        const savedTheme = localStorage.getItem('theme');
-                        if (savedTheme === 'light') {
-                            document.body.classList.add('light-mode');
-                            Elements.themeButton.textContent = '☀️';
-                        } else {
-                            document.body.classList.remove('light-mode');
-                            Elements.themeButton.textContent = '🌙';
-                        }
-                        // Update colors based on theme
-                        this.colors = this.getColors();
-                        if (this.renderer) {
-                            this.renderer.colors = this.colors;
-                        }
-                    }
+                    // toggleTheme() removed
+                    // applySavedTheme() removed
 
                     start() {
                         Elements.startScreen.style.display = 'none';
@@ -1139,12 +1077,8 @@
                     }
 
                     restart() {
-                        Elements.gameOver.style.display = 'none';
-                        this.showCountdown(() => {
-                            this.reset();
-                            this.playBackgroundMusic();
-                            this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
-                        });
+                        this.reset(); // This will set isGameOver to false
+                        this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
                     }
 
                     playBackgroundMusic() {
@@ -1232,16 +1166,24 @@
                     }
 
                     endGame() {
+                        this.isGameOver = true; // Set game over flag
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
-                        Elements.bgm.pause();
-                        Elements.gameOverSound.play();
+                        Elements.bgm.pause(); 
+                        Elements.gameOverSound.play(); 
                         if ('vibrate' in navigator) {
                             navigator.vibrate([500, 200, 500]);
                         }
-                        Elements.finalScore.textContent = this.score;
-                        Elements.gameOver.style.display = 'block';
                         this.saveHighScore();
+                        
+                        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // Semi-transparent overlay
+                        this.ctx.fillRect(0, 0, this.scaledWidth, this.scaledHeight); // Cover the game area
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.font = '40px Arial';
+                        this.ctx.textAlign = 'center';
+                        this.ctx.fillText('Game Over', this.scaledWidth / 2, this.scaledHeight / 2 - 20);
+                        this.ctx.font = '20px Arial';
+                        this.ctx.fillText('Press any key to restart', this.scaledWidth / 2, this.scaledHeight / 2 + 20);
                     }
 
                     updateButtons() {
@@ -1258,8 +1200,8 @@
                 }
 
                 const game = new Game();
-                game.reset();
-                Elements.startScreen.style.display = 'block';
+                game.reset(); 
+                game.gameLoop = requestAnimationFrame(game.gameCycle.bind(game)); 
             });
         })();
     </script>
