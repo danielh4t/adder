@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Snake Game with Touch Controls</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -60,9 +60,6 @@
             gap: 20px;
             animation: slideIn 0.4s ease-out;
         }
-
-
-
 
         main {
             position: relative;
@@ -422,7 +419,7 @@
         </main>
         
         <div class="game-instructions">
-            <p>Controls: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> to move | <kbd>Space</kbd> to pause</p>
+            <p>Controls: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> to move | <kbd>Space</kbd> to pause | Swipe on mobile to control</p>
         </div>
         </div>
         
@@ -762,12 +759,12 @@
 
                     bindEvents() {
                         document.addEventListener('keydown', this.handleKeyDown.bind(this));
-                        document.addEventListener('keyup', this.handleKeyUp.bind(this));
                         Elements.restartButton.addEventListener('click', this.restart.bind(this));
                         Elements.startButton.addEventListener('click', this.start.bind(this));
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+                        this.addTouchControls();
                     }
 
                     handleKeyDown(event) {
@@ -783,10 +780,6 @@
                         if (event.code === 'Space') {
                             this.togglePause();
                         }
-                    }
-
-                    handleKeyUp(event) {
-                        // Empty function but kept for potential future use
                     }
 
                     handleResize() {
@@ -925,6 +918,32 @@
                             this.saveHighScores();
                             this.updateHighScoreDisplay();
                         }
+                    }
+
+                    addTouchControls() {
+                        let touchStartX = 0;
+                        let touchStartY = 0;
+                        const threshold = 30;
+
+                        Elements.gameCanvas.addEventListener('touchstart', (e) => {
+                            if (e.touches.length === 1) {
+                                touchStartX = e.touches[0].clientX;
+                                touchStartY = e.touches[0].clientY;
+                            }
+                        }, { passive: true });
+
+                        Elements.gameCanvas.addEventListener('touchend', (e) => {
+                            const touchEndX = e.changedTouches[0].clientX;
+                            const touchEndY = e.changedTouches[0].clientY;
+                            const diffX = touchEndX - touchStartX;
+                            const diffY = touchEndY - touchStartY;
+
+                            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                                this.snake.enqueueDirection(diffX > 0 ? 'RIGHT' : 'LEFT');
+                            } else if (Math.abs(diffY) > threshold) {
+                                this.snake.enqueueDirection(diffY > 0 ? 'DOWN' : 'UP');
+                            }
+                        }, { passive: true });
                     }
                 }
 
