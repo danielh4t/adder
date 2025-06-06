@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Countdown</title>
+    <title>Snake Game with Improved Maintainability</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -444,7 +444,7 @@
                 <div class="pause-overlay" id="pauseOverlay">
                     <span>Paused</span>
                 </div>
-                <div class="overlay countown" id="countdownOverlay">
+                <div class="overlay countdown" id="countdownOverlay">
                     <span id="countdownNumber">3</span>
                 </div>
                 <div class="overlay game-over" id="gameOver">
@@ -495,9 +495,6 @@
                 <button id="clearHighScoresButton" class="clear-scores-btn">Clear High Scores</button>
             </div>
         </div>
-    </div>
-    <div class="countdown-overlay" id="countdownOverlay">
-        <span id="countdownNumber">3</span>
     </div>
     <script>
         (function () {
