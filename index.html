@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Improved Maintainability</title>
+    <title>Snake Game with Collision Animation</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -431,6 +431,25 @@
             .game-stats h3 {
                 font-size: 18px;
             }
+        }
+
+        /* Collision Animation Styles */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .collision-animation {
+            animation: shake 0.5s;
         }
 
     </style>
@@ -963,9 +982,17 @@
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
                         this.saveHighScore();
-                        
-                        Elements.gameOver.style.display = 'block';
-                        Elements.finalScore.textContent = this.score;
+
+                        Elements.gameCanvas.classList.add('collision-animation');
+
+                        const onAnimationEnd = () => {
+                            Elements.gameCanvas.classList.remove('collision-animation');
+                            Elements.gameOver.style.display = 'block';
+                            Elements.finalScore.textContent = this.score;
+                            Elements.gameCanvas.removeEventListener('animationend', onAnimationEnd);
+                        };
+
+                        Elements.gameCanvas.addEventListener('animationend', onAnimationEnd);
                     }
 
                     updateSnakeLength() {
