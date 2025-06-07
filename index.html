@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Collision Animation</title>
+    <title>Snake Game with High Score Names</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -27,6 +27,12 @@
             --countdown-bg: rgba(0, 0, 0, 0.8);
             --countdown-text: #ffffff;
             --countdown-font-size: 48px;
+            --name-input-bg: rgba(0, 0, 0, 0.8);
+            --name-input-text: #ffffff;
+            --input-border: #32cd32;
+            --input-background: #2c2c2c;
+            --input-text: #ecf0f1;
+            --input-placeholder: #7f8c8d;
         }
 
         * {
@@ -121,6 +127,9 @@
             border-radius: 8px;
             border-left: 3px solid var(--snake-head);
             transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .high-scores li:hover {
@@ -143,8 +152,14 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         @keyframes slideIn {
@@ -152,6 +167,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -184,9 +200,19 @@
             color: var(--countdown-text);
         }
 
+        .overlay.name-input {
+            background: var(--name-input-bg);
+            color: var(--name-input-text);
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .game-over h2,
@@ -272,6 +298,66 @@
             font-size: var(--countdown-font-size);
             font-weight: bold;
             text-shadow: 2px 2px 4px #000;
+        }
+
+        .name-input-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--name-input-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 6;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .name-input-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .name-input-overlay form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--overlay-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .name-input-overlay input {
+            padding: 10px;
+            border: 2px solid var(--input-border);
+            border-radius: 5px;
+            background: var(--input-background);
+            color: var(--input-text);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .name-input-overlay input::placeholder {
+            color: var(--input-placeholder);
+        }
+
+        .name-input-overlay button {
+            padding: 10px;
+            background: var(--button-bg);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background var(--transition-duration) ease;
+        }
+
+        .name-input-overlay button:hover {
+            background: var(--button-hover-bg);
         }
 
         .clear-scores-btn {
@@ -371,7 +457,7 @@
                 max-width: 100%;
                 gap: 20px;
             }
-            
+
             .sidebar {
                 order: 2;
                 display: grid;
@@ -388,33 +474,33 @@
                 gap: 15px;
                 padding: 10px;
             }
-            
+
             main {
                 max-width: calc(100vw - 20px);
                 max-height: calc(100vw - 20px);
                 border-width: 2px;
             }
-            
+
             .sidebar {
                 order: 2;
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 10px;
             }
-            
+
             .stat-item {
                 padding: 8px;
             }
-            
+
             .stat-value {
                 font-size: 20px;
             }
-            
+
             .game-instructions {
                 padding: 10px;
                 font-size: 12px;
@@ -426,7 +512,7 @@
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
-            
+
             .high-scores h3,
             .game-stats h3 {
                 font-size: 18px;
@@ -435,17 +521,39 @@
 
         /* Collision Animation Styles */
         @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
         }
 
         .collision-animation {
@@ -476,13 +584,21 @@
                     <p>Use Arrow Keys to control the snake</p>
                     <button id="startButton" aria-label="Start Game">Start Game</button>
                 </div>
+                <div class="overlay name-input" id="nameInputOverlay">
+                    <form id="nameForm">
+                        <h2>New High Score!</h2>
+                        <p>Enter your name:</p>
+                        <input type="text" id="playerNameInput" placeholder="Your Name" maxlength="20" required />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
             </main>
-            
+
             <div class="game-instructions">
                 <p>Controls: <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> to move | <kbd>Space</kbd> to pause | Swipe on mobile to control</p>
             </div>
         </div>
-        
+
         <div class="sidebar">
             <div class="game-stats">
                 <h3>Game Stats</h3>
@@ -505,11 +621,11 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="high-scores">
                 <h3>🏆 High Scores</h3>
                 <ol id="highScoreList">
-                    <li>0</li>
+                    <li><span>Player</span><span>0</span></li>
                 </ol>
                 <button id="clearHighScoresButton" class="clear-scores-btn">Clear High Scores</button>
             </div>
@@ -545,7 +661,10 @@
                     snakeLength: document.getElementById('snakeLength'),
                     gameSpeed: document.getElementById('gameSpeed'),
                     countdownOverlay: document.getElementById('countdownOverlay'),
-                    countdownNumber: document.getElementById('countdownNumber')
+                    countdownNumber: document.getElementById('countdownNumber'),
+                    nameInputOverlay: document.getElementById('nameInputOverlay'),
+                    nameForm: document.getElementById('nameForm'),
+                    playerNameInput: document.getElementById('playerNameInput')
                 };
 
                 const DIRECTION_MAP = {
@@ -765,43 +884,70 @@
                         this.updateLevel();
                         this.updateSnakeLength();
                         this.updateGameSpeed();
-                        
+
                         // Hide any modals that might be open
                         Elements.pauseOverlay.classList.remove('active');
+                        Elements.nameInputOverlay.classList.remove('active');
                     }
 
                     loadHighScores() {
-                        this.highScores = JSON.parse(localStorage.getItem('highScores')) || [0];
+                        this.highScores = JSON.parse(localStorage.getItem('highScores')) || [{ name: 'Player', score: 0 }];
                         this.updateHighScoreDisplay();
                     }
 
-                    saveHighScores() {
+                saveHighScores() {
                         localStorage.setItem('highScores', JSON.stringify(this.highScores));
                     }
 
                     updateHighScoreDisplay() {
                         Elements.highScoreList.innerHTML = '';
-                        this.highScores.forEach((score, index) => {
+                        this.highScores.forEach((entry) => {
                             const li = document.createElement('li');
-                            li.textContent = score;
+                            const nameSpan = document.createElement('span');
+                            nameSpan.textContent = entry.name;
+                            const scoreSpan = document.createElement('span');
+                            scoreSpan.textContent = entry.score;
+                            li.appendChild(nameSpan);
+                            li.appendChild(scoreSpan);
                             Elements.highScoreList.appendChild(li);
                         });
                     }
 
                     saveHighScore() {
-                        if (this.highScores.length < 5 || this.score > this.highScores[this.highScores.length - 1]) {
-                            this.highScores.push(this.score);
-                            this.highScores.sort((a, b) => b - a);
-                            if (this.highScores.length > 5) {
-                                this.highScores.pop();
-                            }
-                            this.saveHighScores();
-                            this.updateHighScoreDisplay();
-                            if (this.highScores[0] === this.score) {
-                                Elements.highScoreList.children[0].classList.add('new-high-score');
-                                setTimeout(() => Elements.highScoreList.children[0].classList.remove('new-high-score'), 1000);
-                            }
+                        if (this.highScores.length < 5 || this.score > this.highScores[this.highScores.length - 1].score) {
+                            this.promptPlayerName();
                         }
+                    }
+
+                    promptPlayerName() {
+                        this.isPaused = true;
+                        Elements.nameInputOverlay.classList.add('active');
+                        Elements.playerNameInput.focus();
+                    }
+
+                    handleNameSubmit(name) {
+                        this.highScores.push({ name: name || 'Anonymous', score: this.score });
+                        this.highScores.sort((a, b) => b.score - a.score);
+                        if (this.highScores.length > 5) {
+                            this.highScores.pop();
+                        }
+                        this.saveHighScores();
+                        this.updateHighScoreDisplay();
+                        Elements.nameInputOverlay.classList.remove('active');
+                        this.isGameOver = true;
+                        this.isPaused = true;
+                        Elements.gameOver.style.display = 'block';
+                        Elements.finalScore.textContent = this.score;
+                        this.resetSnakeAnimation();
+                    }
+
+                    resetSnakeAnimation() {
+                        Elements.gameCanvas.classList.add('collision-animation');
+                        const onAnimationEnd = () => {
+                            Elements.gameCanvas.classList.remove('collision-animation');
+                            Elements.gameCanvas.removeEventListener('animationend', onAnimationEnd);
+                        };
+                        Elements.gameCanvas.addEventListener('animationend', onAnimationEnd);
                     }
 
                     updateScore() {
@@ -818,6 +964,7 @@
                         Elements.startScreen.style.display = 'none';
                         Elements.pauseOverlay.classList.remove('active');
                         Elements.countdownOverlay.classList.remove('active');
+                        Elements.nameInputOverlay.classList.remove('active');
                     }
 
                     bindEvents() {
@@ -825,13 +972,14 @@
                         Elements.restartButton.addEventListener('click', this.restart.bind(this));
                         Elements.startButton.addEventListener('click', this.start.bind(this));
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
+                        Elements.nameForm.addEventListener('submit', this.handleNameFormSubmit.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                         this.addTouchControls();
                     }
 
                     handleKeyDown(event) {
-                        if (this.isGameOver) {
+                        if (this.isGameOver && event.code !== 'Space') {
                             this.restart();
                             return;
                         }
@@ -944,6 +1092,7 @@
                             this.food = new Food(this.box, this.scaledWidth, this.scaledHeight, this.snake.segments, this.numCols, this.colors);
                             this.increaseSpeed();
                             this.checkLevelUp();
+                            this.renderer.draw(this.renderer);
                         } else {
                             this.snake.pop();
                         }
@@ -982,17 +1131,6 @@
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
                         this.saveHighScore();
-
-                        Elements.gameCanvas.classList.add('collision-animation');
-
-                        const onAnimationEnd = () => {
-                            Elements.gameCanvas.classList.remove('collision-animation');
-                            Elements.gameOver.style.display = 'block';
-                            Elements.finalScore.textContent = this.score;
-                            Elements.gameCanvas.removeEventListener('animationend', onAnimationEnd);
-                        };
-
-                        Elements.gameCanvas.addEventListener('animationend', onAnimationEnd);
                     }
 
                     updateSnakeLength() {
@@ -1006,7 +1144,7 @@
 
                     clearHighScores() {
                         if (confirm('Are you sure you want to clear all high scores?')) {
-                            this.highScores = [0];
+                            this.highScores = [{ name: 'Player', score: 0 }];
                             this.saveHighScores();
                             this.updateHighScoreDisplay();
                         }
@@ -1036,6 +1174,13 @@
                                 this.snake.enqueueDirection(diffY > 0 ? 'DOWN' : 'UP');
                             }
                         }, { passive: true });
+                    }
+
+                    handleNameFormSubmit(event) {
+                        event.preventDefault();
+                        const name = Elements.playerNameInput.value.trim();
+                        this.handleNameSubmit(name);
+                        Elements.playerNameInput.value = '';
                     }
                 }
 
