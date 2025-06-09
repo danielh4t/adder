@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with High Score Names</title>
+    <title>Snake Game with Sound Effects</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -592,6 +592,10 @@
                         <button type="submit">Submit</button>
                     </form>
                 </div>
+                <audio id="eatSound" src="https://freesound.org/data/previews/276/276020_4462728-lq.mp3"></audio>
+                <audio id="gameOverSound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
+                <audio id="pauseSound" src="https://freesound.org/data/previews/341/341695_5260870-lq.mp3"></audio>
+                <audio id="resumeSound" src="https://freesound.org/data/previews/341/341695_5260870-lq.mp3"></audio>
             </main>
 
             <div class="game-instructions">
@@ -664,7 +668,11 @@
                     countdownNumber: document.getElementById('countdownNumber'),
                     nameInputOverlay: document.getElementById('nameInputOverlay'),
                     nameForm: document.getElementById('nameForm'),
-                    playerNameInput: document.getElementById('playerNameInput')
+                    playerNameInput: document.getElementById('playerNameInput'),
+                    eatSound: document.getElementById('eatSound'),
+                    gameOverSound: document.getElementById('gameOverSound'),
+                    pauseSound: document.getElementById('pauseSound'),
+                    resumeSound: document.getElementById('resumeSound')
                 };
 
                 const DIRECTION_MAP = {
@@ -781,9 +789,7 @@
                     }
 
                     draw(renderer) {
-                        // Draw head
                         renderer.drawRect(this.segments[0].x, this.segments[0].y, this.box, this.box, this.colors.SNAKE_HEAD);
-                        // Draw body
                         for (let i = 1; i < this.segments.length; i++) {
                             const segment = this.segments[i];
                             renderer.drawRect(segment.x, segment.y, this.box, this.box, this.colors.SNAKE_BODY);
@@ -885,7 +891,6 @@
                         this.updateSnakeLength();
                         this.updateGameSpeed();
 
-                        // Hide any modals that might be open
                         Elements.pauseOverlay.classList.remove('active');
                         Elements.nameInputOverlay.classList.remove('active');
                     }
@@ -895,7 +900,7 @@
                         this.updateHighScoreDisplay();
                     }
 
-                saveHighScores() {
+                    saveHighScores() {
                         localStorage.setItem('highScores', JSON.stringify(this.highScores));
                     }
 
@@ -1021,6 +1026,8 @@
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
                         Elements.pauseOverlay.classList.add('active');
+                        Elements.pauseSound.currentTime = 0;
+                        Elements.pauseSound.play();
                     }
 
                     resume() {
@@ -1028,6 +1035,8 @@
                         this.lastFrameTime = performance.now();
                         this.gameLoop = requestAnimationFrame(this.gameCycle.bind(this));
                         Elements.pauseOverlay.classList.remove('active');
+                        Elements.resumeSound.currentTime = 0;
+                        Elements.resumeSound.play();
                     }
 
                     start() {
@@ -1093,6 +1102,8 @@
                             this.increaseSpeed();
                             this.checkLevelUp();
                             this.renderer.draw(this.renderer);
+                            Elements.eatSound.currentTime = 0;
+                            Elements.eatSound.play();
                         } else {
                             this.snake.pop();
                         }
@@ -1130,6 +1141,8 @@
                         this.isGameOver = true;
                         this.isPaused = true;
                         cancelAnimationFrame(this.gameLoop);
+                        Elements.gameOverSound.currentTime = 0;
+                        Elements.gameOverSound.play();
                         this.saveHighScore();
                     }
 
@@ -1185,7 +1198,7 @@
                 }
 
                 const game = new Game();
-                Elements.startScreen.style.display = 'block'; // Show start screen initially
+                Elements.startScreen.style.display = 'block';
             });
         })();
     </script>
