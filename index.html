@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Sound Effects</title>
+    <title>Snake Game with Sound Toggle</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -560,6 +560,24 @@
             animation: shake 0.5s;
         }
 
+        #muteButton {
+            background: #555555;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background var(--transition-duration) ease;
+        }
+
+        #muteButton:hover {
+            background: #777777;
+        }
+
+        #muteButton:active {
+            background: #333333;
+        }
+
     </style>
 </head>
 
@@ -632,6 +650,7 @@
                     <li><span>Player</span><span>0</span></li>
                 </ol>
                 <button id="clearHighScoresButton" class="clear-scores-btn">Clear High Scores</button>
+                <button id="muteButton">Mute</button>
             </div>
         </div>
     </div>
@@ -672,7 +691,8 @@
                     eatSound: document.getElementById('eatSound'),
                     gameOverSound: document.getElementById('gameOverSound'),
                     pauseSound: document.getElementById('pauseSound'),
-                    resumeSound: document.getElementById('resumeSound')
+                    resumeSound: document.getElementById('resumeSound'),
+                    muteButton: document.getElementById('muteButton')
                 };
 
                 const DIRECTION_MAP = {
@@ -834,6 +854,7 @@
                         this.renderer = new Renderer(this.ctx, this.colors);
                         this.reset();
                         this.bindEvents();
+                        this.loadMuteState();
                     }
 
                     getColors() {
@@ -978,6 +999,7 @@
                         Elements.startButton.addEventListener('click', this.start.bind(this));
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                         Elements.nameForm.addEventListener('submit', this.handleNameFormSubmit.bind(this));
+                        Elements.muteButton.addEventListener('click', this.toggleMute.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
                         this.addTouchControls();
@@ -1194,6 +1216,26 @@
                         const name = Elements.playerNameInput.value.trim();
                         this.handleNameSubmit(name);
                         Elements.playerNameInput.value = '';
+                    }
+
+                    toggleMute() {
+                        const isMuted = localStorage.getItem('isMuted') === 'true';
+                        const newMuteState = !isMuted;
+                        localStorage.setItem('isMuted', newMuteState);
+                        Elements.eatSound.muted = newMuteState;
+                        Elements.gameOverSound.muted = newMuteState;
+                        Elements.pauseSound.muted = newMuteState;
+                        Elements.resumeSound.muted = newMuteState;
+                        Elements.muteButton.textContent = newMuteState ? 'Unmute' : 'Mute';
+                    }
+
+                    loadMuteState() {
+                        const isMuted = localStorage.getItem('isMuted') === 'true';
+                        Elements.eatSound.muted = isMuted;
+                        Elements.gameOverSound.muted = isMuted;
+                        Elements.pauseSound.muted = isMuted;
+                        Elements.resumeSound.muted = isMuted;
+                        Elements.muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
                     }
                 }
 
