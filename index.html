@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game with Sound Toggle</title>
+    <title>Snake Game with Fullscreen Toggle</title>
     <style>
         :root {
             --game-background: #1e1e1e;
@@ -360,16 +360,20 @@
             background: var(--button-hover-bg);
         }
 
-        .clear-scores-btn {
+        .clear-scores-btn,
+        #fullscreenButton {
             background: linear-gradient(135deg, #ff4500, #ff6347);
             padding: 8px 16px;
             font-size: 14px;
             margin-top: 15px;
             transition: all 0.2s ease;
             border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
         }
 
-        .clear-scores-btn:hover {
+        .clear-scores-btn:hover,
+        #fullscreenButton:hover {
             background: linear-gradient(135deg, #ff6347, #ff4500);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
@@ -560,7 +564,8 @@
             animation: shake 0.5s;
         }
 
-        #muteButton {
+        #muteButton,
+        #fullscreenButton {
             background: #555555;
             color: #ffffff;
             padding: 10px 20px;
@@ -568,13 +573,17 @@
             font-size: 16px;
             cursor: pointer;
             transition: background var(--transition-duration) ease;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        #muteButton:hover {
+        #muteButton:hover,
+        #fullscreenButton:hover {
             background: #777777;
         }
 
-        #muteButton:active {
+        #muteButton:active,
+        #fullscreenButton:active {
             background: #333333;
         }
 
@@ -651,6 +660,7 @@
                 </ol>
                 <button id="clearHighScoresButton" class="clear-scores-btn">Clear High Scores</button>
                 <button id="muteButton">Mute</button>
+                <button id="fullscreenButton">Fullscreen</button>
             </div>
         </div>
     </div>
@@ -692,7 +702,8 @@
                     gameOverSound: document.getElementById('gameOverSound'),
                     pauseSound: document.getElementById('pauseSound'),
                     resumeSound: document.getElementById('resumeSound'),
-                    muteButton: document.getElementById('muteButton')
+                    muteButton: document.getElementById('muteButton'),
+                    fullscreenButton: document.getElementById('fullscreenButton')
                 };
 
                 const DIRECTION_MAP = {
@@ -1000,9 +1011,39 @@
                         Elements.clearHighScoresButton.addEventListener('click', this.clearHighScores.bind(this));
                         Elements.nameForm.addEventListener('submit', this.handleNameFormSubmit.bind(this));
                         Elements.muteButton.addEventListener('click', this.toggleMute.bind(this));
+                        Elements.fullscreenButton.addEventListener('click', this.toggleFullscreen.bind(this));
                         window.addEventListener('resize', debounce(this.handleResize.bind(this), 100));
                         document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+                        document.addEventListener('fullscreenchange', this.updateFullscreenButton.bind(this));
                         this.addTouchControls();
+                    }
+
+                    handleFullscreenChange() {
+                        if (document.fullscreenElement) {
+                            Elements.fullscreenButton.textContent = 'Exit Fullscreen';
+                        } else {
+                            Elements.fullscreenButton.textContent = 'Fullscreen';
+                        }
+                    }
+
+                    updateFullscreenButton() {
+                        if (document.fullscreenElement) {
+                            Elements.fullscreenButton.textContent = 'Exit Fullscreen';
+                        } else {
+                            Elements.fullscreenButton.textContent = 'Fullscreen';
+                        }
+                    }
+
+                    toggleFullscreen() {
+                        if (!document.fullscreenElement) {
+                            document.documentElement.requestFullscreen().catch(err => {
+                                console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+                            });
+                        } else {
+                            if (document.exitFullscreen) {
+                                document.exitFullscreen();
+                            }
+                        }
                     }
 
                     handleKeyDown(event) {
